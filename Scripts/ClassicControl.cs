@@ -10,13 +10,24 @@ namespace simcam
     modern simulation, god, and rts games.  Basically, hover and a hieght and 
     use keys or on-screen buttons to rotate and possible raise/lower the camera.
     */
-    public class ClassicControl : MonoBehaviour, ICameraControl
+    public class ClassicControl : ICameraControl
     
     {
-        // Start is called before the first frame update
+        /*// Start is called before the first frame update
         void Start()
         {
             
+        }*/
+
+        void OnEnable() 
+        {
+
+        }
+
+
+        void OnDisable() 
+        {
+
         }
 
         // Update is called once per frame

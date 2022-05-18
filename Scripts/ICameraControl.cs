@@ -5,7 +5,7 @@ using UnityEngine;
 namespace simcam 
 {
 
-    public interface ICameraControl
+    public abstract class ICameraControl : MonoBehaviour
     {
         // TODO: Not sure what I need here, but probably something to standardize controls
 

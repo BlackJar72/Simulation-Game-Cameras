@@ -10,10 +10,21 @@ namespace simcam
     (i.e., a "fly-cam"), similar to creative and spectator modes in one 
     well know game.
     */
-    public class FirstPersonControl : MonoBehaviour, ICameraControl
+    public class FirstPersonControl : ICameraControl
     {
-        // Start is called before the first frame update
+        /*// Start is called before the first frame update
         void Start()
+        {
+            
+        }*/
+
+        void OnEnable() 
+        {
+
+        }
+
+
+        void OnDisable() 
         {
             
         }
