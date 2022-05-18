@@ -19,16 +19,17 @@ namespace simcam
             
         }*/
 
-        void OnEnable() 
+        protected override void OnEnable() 
         {
-
+            // Will this be needed here?  IDK.
         }
 
 
-        void OnDisable() 
+        protected override void OnDisable() 
         {
-
+            // Will this be needed here?  IDK.
         }
+
 
         // Update is called once per frame
         void Update()

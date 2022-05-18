@@ -7,7 +7,19 @@ namespace simcam
 
     public abstract class ICameraControl : MonoBehaviour
     {
-        // TODO: Not sure what I need here, but probably something to standardize controls
+        // TODO: Not sure what I need here, but probably something to standardize controls.
+
+
+        protected virtual void OnEnable() 
+        {
+
+        }
+
+
+        protected virtual void OnDisable() 
+        {
+            
+        }
 
     }
 
