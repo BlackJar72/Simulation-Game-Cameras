@@ -29,8 +29,6 @@ namespace simcam
         public Quaternion heading = Quaternion.identity;
         private Quaternion tilt    = Quaternion.identity;
 
-        public float debugAxis;
-
         // TODO:  This should be based on a (game or lot specific) array of 1 or more descrete heights;
         //        that is, for a classic city-builder or strategy game one high above the world, or
         //        for a Sims style like game one for each floor of the lots highest building little
@@ -76,8 +74,6 @@ namespace simcam
 
 
         void AdjustHeading() {
-            debugAxis = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
-            if(Mathf.Abs(debugAxis) > 10) Debug.Log(debugAxis);
             float rotation = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
             headingAngle += rotation;
             if(headingAngle > 360) headingAngle-= 360;
