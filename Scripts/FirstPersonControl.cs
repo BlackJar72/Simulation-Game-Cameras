@@ -18,7 +18,7 @@ namespace simcam
         [SerializeField]
         private float moveSpeed = 1;
         [SerializeField]
-        private Camera camera;
+        private Camera playerEye;
 
         private float headingAngle = 0;
         private float tiltAngle = 0;
@@ -29,7 +29,7 @@ namespace simcam
         private Quaternion tilt    = Quaternion.identity;
 
 
-        // TODO: Need to implement ray-based camera picking so as to interact with the game invironment.
+        // TODO: Need to implement ray-based camera picking so as to interact with the game environment.
 
 
         //*

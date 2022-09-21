@@ -19,14 +19,14 @@ namespace simcam
         [SerializeField]
         private int windowBoundarySize = 10;
         [SerializeField]
-        private Camera camera;
+        private Camera playerEye;
 
-        public float headingAngle = 0;
+        private float headingAngle = 0;
         private float tiltAngle = 0;
 
         private Vector3 mousePos, movement;
 
-        public Quaternion heading = Quaternion.identity;
+        private Quaternion heading = Quaternion.identity;
         private Quaternion tilt    = Quaternion.identity;
 
         // TODO:  This should be based on a (game or lot specific) array of 1 or more descrete heights;
@@ -39,7 +39,7 @@ namespace simcam
         //        with a definite minimum and maximum of course (we certainly don't want them moving to though
         //        the floor or even the ceiling of a viewed room for example).
 
-        // TODO: Need to implement ray-based camera picking so as to interact with the game invironment.
+        // TODO: Need to implement ray-based camera picking so as to interact with the game environment.
 
 
         // Start is called before the first frame update
