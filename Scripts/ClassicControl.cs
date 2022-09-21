@@ -13,7 +13,7 @@ namespace simcam
     public class ClassicControl : ICameraControl
     {
         [SerializeField]
-        private float rotationSpeed = 1;
+        private float rotationSpeed = 60;
         [SerializeField]
         private float moveSpeed = 1;
         [SerializeField]
@@ -21,13 +21,15 @@ namespace simcam
         [SerializeField]
         private Camera camera;
 
-        private float headingAngle = 0;
+        public float headingAngle = 0;
         private float tiltAngle = 0;
 
         private Vector3 mousePos, movement;
 
-        private Quaternion heading = Quaternion.identity;
+        public Quaternion heading = Quaternion.identity;
         private Quaternion tilt    = Quaternion.identity;
+
+        public float debugAxis;
 
         // TODO:  This should be based on a (game or lot specific) array of 1 or more descrete heights;
         //        that is, for a classic city-builder or strategy game one high above the world, or
@@ -74,18 +76,20 @@ namespace simcam
 
 
         void AdjustHeading() {
-            float rotation = Input.GetAxis("Horizontal") * rotationSpeed / Time.deltaTime;
+            debugAxis = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
+            if(Mathf.Abs(debugAxis) > 10) Debug.Log(debugAxis);
+            float rotation = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
             headingAngle += rotation;
-            if(headingAngle> 360) headingAngle-= 360;
+            if(headingAngle > 360) headingAngle-= 360;
             else if(headingAngle < 0) headingAngle += 360;
             heading = Quaternion.Euler(0, headingAngle, 0);
         }
 
 
         void AdjustPitch() {
-            float rotation = Input.GetAxis("Vertical") * rotationSpeed / Time.deltaTime;
+            float rotation = Input.GetAxis("Vertical") * rotationSpeed * Time.deltaTime;
             tiltAngle -= rotation;
-            tiltAngle = Mathf.Clamp(tiltAngle, -80, 80);
+            tiltAngle = Mathf.Clamp(tiltAngle, 0, 90);
             tilt = Quaternion.Euler(tiltAngle, 0, 0);
         }
 

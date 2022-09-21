@@ -14,7 +14,7 @@ namespace simcam
     public class FirstPersonControl : ICameraControl
     {
         [SerializeField]
-        private float rotationSpeed = 1;
+        private float rotationSpeed = 5;
         [SerializeField]
         private float moveSpeed = 1;
         [SerializeField]
@@ -63,7 +63,7 @@ namespace simcam
 
 
         void AdjustHeading() {
-            float rotation = Input.GetAxis("Mouse X") * rotationSpeed / Time.deltaTime;
+            float rotation = Input.GetAxis("Mouse X") * rotationSpeed;// * Time.deltaTime;
             headingAngle += rotation;
             if(headingAngle> 360) headingAngle-= 360;
             else if(headingAngle < 0) headingAngle += 360;
@@ -72,8 +72,8 @@ namespace simcam
 
 
         void AdjustPitch() {
-            float rotation = Input.GetAxis("Mouse Y") * rotationSpeed / Time.deltaTime;
-            tiltAngle += rotation;
+            float rotation = Input.GetAxis("Mouse Y") * rotationSpeed;// * Time.deltaTime;
+            tiltAngle -= rotation;
             tiltAngle = Mathf.Clamp(tiltAngle, -80, 80);
             tilt = Quaternion.Euler(tiltAngle, 0, 0);
         }
