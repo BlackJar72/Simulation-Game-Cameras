@@ -17,14 +17,19 @@ namespace simcam
         private float rotationSpeed = 1;
         [SerializeField]
         private float moveSpeed = 1;
+        [SerializeField]
+        private Camera camera;
 
-        public float headingAngle = 0;
-        public float tiltAngle = 0;
+        private float headingAngle = 0;
+        private float tiltAngle = 0;
 
-        public Vector3 movement;
+        private Vector3 movement;
 
-        public Quaternion heading = Quaternion.identity;
-        public Quaternion tilt    = Quaternion.identity;
+        private Quaternion heading = Quaternion.identity;
+        private Quaternion tilt    = Quaternion.identity;
+
+
+        // TODO: Need to implement ray-based camera picking so as to interact with the game invironment.
 
 
         //*
@@ -37,7 +42,7 @@ namespace simcam
        /*
        protected override void OnEnable()
         {
-            // Will this be needed here?  IDK.
+            Cursor.lockState = CursorLockMode.Locked;
         }
 
 
