@@ -20,14 +20,18 @@ namespace simcam
         private int windowBoundarySize = 10;
         [SerializeField]
         private Camera playerEye;
+        [SerializeField]
+        private float minZoomDist = 5, maxZoomDist = -50;
 
         private float headingAngle = 0;
         private float tiltAngle = 0;
+        public float zoomDist = 0;
 
         private Vector3 mousePos, movement;
 
         private Quaternion heading = Quaternion.identity;
         private Quaternion tilt    = Quaternion.identity;
+        public  Quaternion angle   = Quaternion.identity;
 
         // TODO:  This should be based on a (game or lot specific) array of 1 or more descrete heights;
         //        that is, for a classic city-builder or strategy game one high above the world, or
@@ -70,6 +74,7 @@ namespace simcam
             AdjustPitch();
             SetRotation();
             Move();
+            Zoom();
         }
 
 
@@ -91,7 +96,8 @@ namespace simcam
 
 
         void SetRotation() {
-            transform.rotation = heading * tilt;
+            angle = heading * tilt;
+            transform.rotation = angle;
         }
 
 
@@ -115,6 +121,15 @@ namespace simcam
             movement *= moveSpeed ;
             movement *= Time.deltaTime;
             transform.Translate(movement, Space.World);
+        }
+
+
+        void Zoom() {
+            float change = Input.mouseScrollDelta.y;
+            zoomDist += change;
+            // Due to the direction of movement, max and min are swapped here
+            zoomDist = Mathf.Clamp(zoomDist, maxZoomDist, minZoomDist);
+            playerEye.transform.localPosition = Vector3.forward * zoomDist;
         }
     }
 
