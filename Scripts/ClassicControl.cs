@@ -10,7 +10,7 @@ namespace simcam
     modern simulation, god, and rts games.  Basically, hover and a hieght and 
     use keys or on-screen buttons to rotate and possible raise/lower the camera.
     */
-    public class ClassicControl : ICameraControl
+    public class ClassicControl : ACameraControl
     {
         [SerializeField]
         private float rotationSpeed = 60;
@@ -19,31 +19,22 @@ namespace simcam
         [SerializeField]
         private int windowBoundarySize = 10;
         [SerializeField]
-        private Camera playerEye;
-        [SerializeField]
-        private float minZoomDist = 5, maxZoomDist = -50;
+        private float minZoomDist = 10, maxZoomDist = -50;
 
         private float headingAngle = 0;
         private float tiltAngle = 0;
-        public float zoomDist = 0;
+        private float zoomDist = 0;
 
         private Vector3 mousePos, movement;
 
         private Quaternion heading = Quaternion.identity;
         private Quaternion tilt    = Quaternion.identity;
-        public  Quaternion angle   = Quaternion.identity;
+        private Quaternion angle   = Quaternion.identity;
 
         // TODO:  This should be based on a (game or lot specific) array of 1 or more descrete heights;
         //        that is, for a classic city-builder or strategy game one high above the world, or
         //        for a Sims style like game one for each floor of the lots highest building little
         //        above those floors -- etc, as other possibilities are hypothetically possible.
-
-        // TODO:  Need to implement a zoom function, likely based slighting the camera along a line through
-        //        the camera holding empty to which this is attached along the local forward direction and
-        //        with a definite minimum and maximum of course (we certainly don't want them moving to though
-        //        the floor or even the ceiling of a viewed room for example).
-
-        // TODO: Need to implement ray-based camera picking so as to interact with the game environment.
 
 
         // Start is called before the first frame update
@@ -75,6 +66,7 @@ namespace simcam
             SetRotation();
             Move();
             Zoom();
+            CheckClicks();
         }
 
 
@@ -102,8 +94,8 @@ namespace simcam
 
 
         void Move() {
-            /*Vector3*/ movement = Vector3.zero;
-            /*Vector3*/ mousePos = Input.mousePosition;
+            movement = Vector3.zero;
+            mousePos = Input.mousePosition;
             if(mousePos.y <= windowBoundarySize) {
                 movement.z = -1;
             } else if(mousePos.y >= (Screen.height - windowBoundarySize)) {
@@ -130,6 +122,36 @@ namespace simcam
             // Due to the direction of movement, max and min are swapped here
             zoomDist = Mathf.Clamp(zoomDist, maxZoomDist, minZoomDist);
             playerEye.transform.localPosition = Vector3.forward * zoomDist;
+        }
+
+
+        void CheckClicks() {
+            if(Input.GetMouseButtonUp(0)) {
+                Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
+                if(Physics.Raycast(ray, out RaycastHit hit)) {
+                    OnLeftclickCam(hit);
+                }
+            } else if(Input.GetMouseButton(0)) {
+                Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
+                if(Physics.Raycast(ray, out RaycastHit hit)) {
+                    OnLeftholdCam(hit);
+                }
+            }
+            if(Input.GetMouseButtonUp(1)) {
+                Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
+                if(Physics.Raycast(ray, out RaycastHit hit)) {
+                    OnRightclickCam(hit);
+                }
+            } else if(Input.GetMouseButton(1)) {
+                Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out RaycastHit hit)) {
+                    OnRightholdCam(hit);
+                }
+            }
+            if(Input.GetMouseButtonUp(2)) {
+                zoomDist = 0f;
+                playerEye.transform.localPosition = Vector3.zero;
+            }
         }
     }
 

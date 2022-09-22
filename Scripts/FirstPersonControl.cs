@@ -11,14 +11,12 @@ namespace simcam
     well know game.  This version uses the old input system; a version
     using the new input system will come later.
     */
-    public class FirstPersonControl : ICameraControl
+    public class FirstPersonControl : ACameraControl
     {
         [SerializeField]
         private float rotationSpeed = 5;
         [SerializeField]
         private float moveSpeed = 1;
-        [SerializeField]
-        private Camera playerEye;
 
         private float headingAngle = 0;
         private float tiltAngle = 0;
@@ -28,8 +26,6 @@ namespace simcam
         private Quaternion heading = Quaternion.identity;
         private Quaternion tilt    = Quaternion.identity;
 
-
-        // TODO: Need to implement ray-based camera picking so as to interact with the game environment.
 
 
         //*
@@ -85,7 +81,7 @@ namespace simcam
 
 
         void Move() {
-            /*Vector3*/ movement = Vector3.zero;
+            movement = Vector3.zero;
             movement.z = Input.GetAxis("Vertical");
             movement.x = Input.GetAxis("Horizontal");
             movement = heading * movement;
@@ -95,6 +91,32 @@ namespace simcam
             movement *= moveSpeed ;
             movement *= Time.deltaTime;
             transform.Translate(movement, Space.World);
+        }
+
+
+        void CheckClicks() {
+            if(Input.GetMouseButtonUp(0)) {
+                if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward,
+                            out RaycastHit hit, playerEye.farClipPlane)) {
+                    OnLeftclickCam(hit);
+                }
+            } else if(Input.GetMouseButton(0)) {
+                if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward,
+                        out RaycastHit hit, playerEye.farClipPlane)) {
+                    OnLeftholdCam(hit);
+                }
+            }
+            if(Input.GetMouseButton(1)) {
+                if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward,
+                            out RaycastHit hit, playerEye.farClipPlane)) {
+                    OnRightclickCam(hit);
+                }
+            } else if(Input.GetMouseButton(1)) {
+                if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward,
+                        out RaycastHit hit, playerEye.farClipPlane)) {
+                    OnRightholdCam(hit);
+                }
+            }
         }
 
     }

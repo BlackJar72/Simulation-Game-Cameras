@@ -12,7 +12,7 @@ namespace simcam
     */
     public class ModeSwitch : MonoBehaviour
     {
-        [SerializeField] ICameraControl[] camModes;
+        [SerializeField] ACameraControl[] camModes;
         [SerializeField] uint defaultMode;
 
         private int mode;
