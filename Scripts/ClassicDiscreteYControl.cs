@@ -18,7 +18,7 @@ namespace simcam {
         [SerializeField]
         private float minZoomDist = 10, maxZoomDist = -50;
 
-        [SerializeField][Tooltip("Altitude (Y coordinates) for levels; must have at least one valid value")]
+        [SerializeField][Tooltip("Altitude (Y coordinates) for levels; must have at least one valid value.")]
         private float[] levelHeights;
         private int level = 0;
 
@@ -31,6 +31,9 @@ namespace simcam {
         private Quaternion heading = Quaternion.identity;
         private Quaternion tilt = Quaternion.identity;
         private Quaternion angle = Quaternion.identity;
+
+        public delegate void LevelChangeHandler(int level);
+        public event LevelChangeHandler LevelChanged;
 
         // TODO:  This should be based on a (game or lot specific) array of 1 or more descrete heights;
         //        that is, for a classic city-builder or strategy game one high above the world, or
@@ -107,8 +110,8 @@ namespace simcam {
                 movement.x = 1;
             }
             movement = heading * movement;
-            if (Input.GetKey(KeyCode.Q)) ChangeLevel(-1);
-            if (Input.GetKey(KeyCode.E)) ChangeLevel(1);
+            if (Input.GetKeyUp(KeyCode.Q)) ChangeLevel(-1);
+            if (Input.GetKeyUp(KeyCode.E)) ChangeLevel(1);
             movement.Normalize();
             movement *= moveSpeed;
             movement *= Time.deltaTime;
@@ -123,6 +126,7 @@ namespace simcam {
             Vector3 pos = transform.position;
             pos.y = levelHeights[level];
             transform.position = pos;
+            LevelChanged?.Invoke(level);
         }
 
 
@@ -162,6 +166,12 @@ namespace simcam {
                 zoomDist = 0f;
                 playerEye.transform.localPosition = Vector3.zero;
             }
+        }
+
+
+        public void SetLevels(float[] levels) {
+            levelHeights = levels;
+            ChangeLevel(0);
         }
     }
 }
