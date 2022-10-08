@@ -1,7 +1,7 @@
 using UnityEngine;
 
 
-namespace simcam {
+namespace SimCam {
 
     /**
     This is for moving the camera in a way typical of most classic and many
@@ -53,6 +53,7 @@ namespace simcam {
     {
         // TODO/FIXME: This needs to be changed for platforms other than Windows and Linux
         Cursor.lockState = CursorLockMode.Confined;
+        base.OnEnable();
     }
 
 
@@ -143,23 +144,23 @@ namespace simcam {
             if (Input.GetMouseButtonUp(0)) {
                 Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out RaycastHit hit)) {
-                    OnLeftclickCam(hit);
+                    OnLeftUpCam(hit);
                 }
-            } else if (Input.GetMouseButton(0)) {
+            } else if (Input.GetMouseButtonDown(0)) {
                 Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out RaycastHit hit)) {
-                    OnLeftholdCam(hit);
+                    OnLeftDownCam(hit);
                 }
             }
             if (Input.GetMouseButtonUp(1)) {
                 Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out RaycastHit hit)) {
-                    OnRightclickCam(hit);
+                    OnRightUpCam(hit);
                 }
-            } else if (Input.GetMouseButton(1)) {
+            } else if (Input.GetMouseButtonDown(1)) {
                 Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out RaycastHit hit)) {
-                    OnRightholdCam(hit);
+                    OnRightDownCam(hit);
                 }
             }
             if (Input.GetMouseButtonUp(2)) {

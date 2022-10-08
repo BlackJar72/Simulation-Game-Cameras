@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-namespace simcam {
+namespace SimCam {
 
     /**
     This is for this is for first person flying that always moves relative to the
@@ -36,6 +36,7 @@ namespace simcam {
         protected override void OnEnable()
          {
              Cursor.lockState = CursorLockMode.Locked;
+             base.OnEnable();
          }
 
 
@@ -94,23 +95,23 @@ namespace simcam {
             if(Input.GetMouseButtonUp(0)) {
                 if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward,
                         out RaycastHit hit, playerEye.farClipPlane)) {
-                    OnLeftclickCam(hit);
+                    OnLeftUpCam(hit);
                 }
-            } else if(Input.GetMouseButton(0)) {
+            } else if(Input.GetMouseButtonDown(0)) {
                 if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward,
                         out RaycastHit hit, playerEye.farClipPlane)) {
-                    OnLeftholdCam(hit);
+                    OnLeftDownCam(hit);
                 }
             }
             if(Input.GetMouseButton(1)) {
                 if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward,
                         out RaycastHit hit, playerEye.farClipPlane)) {
-                    OnRightclickCam(hit);
+                    OnRightUpCam(hit);
                 }
-            } else if(Input.GetMouseButton(1)) {
+            } else if(Input.GetMouseButtonDown(1)) {
                 if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward,
                         out RaycastHit hit, playerEye.farClipPlane)) {
-                    OnRightholdCam(hit);
+                    OnRightDownCam(hit);
                 }
             }
         }
