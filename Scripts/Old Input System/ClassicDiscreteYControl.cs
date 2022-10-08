@@ -22,15 +22,7 @@ namespace SimCam {
         private float[] levelHeights;
         private int level = 0;
 
-        private float headingAngle = 0;
-        private float tiltAngle = 0;
-        private float zoomDist = 0;
 
-        private Vector3 mousePos, movement;
-
-        private Quaternion heading = Quaternion.identity;
-        private Quaternion tilt = Quaternion.identity;
-        private Quaternion angle = Quaternion.identity;
 
         // TODO:  This should be based on a (game or lot specific) array of 1 or more descrete heights;
         //        that is, for a classic city-builder or strategy game one high above the world, or
@@ -50,7 +42,8 @@ namespace SimCam {
         {
             // TODO/FIXME: This needs to be changed for platforms other than Windows and Linux
             Cursor.lockState = CursorLockMode.Confined;
-            playerEye.transform.position = Vector3.zero;
+            playerEye.transform.localPosition = Vector3.zero;
+            ChangeLevel(0);
             zoomDist = 0f;
             base.OnEnable();
         }
@@ -58,6 +51,7 @@ namespace SimCam {
 
         protected override void OnDisable()
         {
+            base.OnDisable();
             // Will this be needed here?  IDK.
         }
 

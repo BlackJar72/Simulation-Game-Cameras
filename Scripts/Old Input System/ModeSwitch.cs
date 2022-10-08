@@ -12,7 +12,8 @@ namespace SimCam
     */
     public class ModeSwitch : MonoBehaviour
     {
-        [SerializeField] ACameraControl[] camModes;
+        public ACameraControl[] camModes;
+
         [SerializeField] uint defaultMode;
 
         private int mode;
@@ -20,6 +21,8 @@ namespace SimCam
         // Start is called before the first frame update
         void Awake()
         {
+            camModes = gameObject.GetComponents<ACameraControl>();
+            Debug.Log(camModes);
             mode = (int)defaultMode % (int)camModes.Length;
         }
 
@@ -27,14 +30,21 @@ namespace SimCam
         // Update is called once per frame
         void Update()
         {
-            
+            if(Input.GetKeyDown(KeyCode.F)) {
+                Increment();
+            }
+        }
+
+
+        void OnEnable() {
+            camModes[mode].enabled = true;
         }
 
 
         public void Increment() {
             int previous = mode;
             mode++;
-            if(mode > camModes.Length) mode = 0;
+            if(mode >= camModes.Length) mode = 0;
             camModes[previous].enabled = false;
             camModes[mode].enabled = true;
         }
@@ -43,7 +53,7 @@ namespace SimCam
         public void Decriment() {
             int previous = mode;
             mode--;
-            if(mode < 0) mode = camModes.Length;
+            if(mode < 0) mode = camModes.Length - 1;
             camModes[previous].enabled = false;
             camModes[mode].enabled = true;
         }

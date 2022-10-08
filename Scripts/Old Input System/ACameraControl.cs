@@ -33,6 +33,18 @@ namespace SimCam
         protected bool  RMouseDown;
         protected float RMouseDownAt;
 
+        // Former member of derived classes made static here
+        // so the data will be shared between them;
+        protected static float headingAngle = 0;
+        protected static float tiltAngle = 0;
+        protected static float zoomDist = 0;
+
+        protected static Vector3 mousePos, movement;
+
+        protected static Quaternion heading = Quaternion.identity;
+        protected static Quaternion tilt = Quaternion.identity;
+        protected static Quaternion angle = Quaternion.identity;
+
 
         void Awake() {
             layerString.Trim();

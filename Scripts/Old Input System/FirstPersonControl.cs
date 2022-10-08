@@ -18,15 +18,6 @@ namespace SimCam
         [SerializeField]
         private float moveSpeed = 1;
 
-        private float headingAngle = 0;
-        private float tiltAngle = 0;
-
-        private Vector3 movement;
-
-        private Quaternion heading = Quaternion.identity;
-        private Quaternion tilt    = Quaternion.identity;
-
-
 
         //*
         // Start is called before the first frame update
@@ -39,13 +30,14 @@ namespace SimCam
        protected override void OnEnable()
         {
             Cursor.lockState = CursorLockMode.Locked;
-            playerEye.transform.position = Vector3.zero;
+            playerEye.transform.localPosition = Vector3.zero;
             base.OnEnable();
         }
 
 
         protected override void OnDisable() 
         {
+            base.OnDisable();
             // Will this be needed here?  IDK.            
         }
 
