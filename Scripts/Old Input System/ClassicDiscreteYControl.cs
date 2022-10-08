@@ -143,23 +143,23 @@ namespace SimCam {
         void CheckClicks() {
             if (Input.GetMouseButtonUp(0)) {
                 Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out RaycastHit hit)) {
+                if (Physics.Raycast(ray, out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
                     OnLeftUpCam(hit);
                 }
             } else if (Input.GetMouseButtonDown(0)) {
                 Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out RaycastHit hit)) {
+                if (Physics.Raycast(ray, out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
                     OnLeftDownCam(hit);
                 }
             }
             if (Input.GetMouseButtonUp(1)) {
                 Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out RaycastHit hit)) {
+                if (Physics.Raycast(ray, out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
                     OnRightUpCam(hit);
                 }
             } else if (Input.GetMouseButtonDown(1)) {
                 Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out RaycastHit hit)) {
+                if (Physics.Raycast(ray, out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
                     OnRightDownCam(hit);
                 }
             }

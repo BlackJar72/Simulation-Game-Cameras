@@ -25,16 +25,16 @@ namespace SimCim {
         void OnEnable() {
             ACameraControl.LeftclickCam  += ForwardLeftClick;
             ACameraControl.LeftholdCam   += ForwardLeftHold;
-            ACameraControl.RightclickCam += ForwardLeftClick;
-            ACameraControl.RightholdCam  += ForwardLeftHold;
+            ACameraControl.RightclickCam += ForwardRightClick;
+            ACameraControl.RightholdCam  += ForwardRightHold;
         }
 
 
         void OnDisable() {
             ACameraControl.LeftclickCam  -= ForwardLeftClick;
             ACameraControl.LeftholdCam   -= ForwardLeftHold;
-            ACameraControl.RightclickCam -= ForwardLeftClick;
-            ACameraControl.RightholdCam  -= ForwardLeftHold;
+            ACameraControl.RightclickCam -= ForwardRightClick;
+            ACameraControl.RightholdCam  -= ForwardRightHold;
         }
 
 

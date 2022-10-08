@@ -56,6 +56,7 @@ namespace SimCam
             AdjustPitch();
             SetRotation();
             Move();
+            CheckClicks();
         }
 
 
@@ -98,23 +99,23 @@ namespace SimCam
         void CheckClicks() {
             if(Input.GetMouseButtonUp(0)) {
                 if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward,
-                            out RaycastHit hit, playerEye.farClipPlane)) {
+                            out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
                     OnLeftUpCam(hit);
                 }
             } else if(Input.GetMouseButtonDown(0)) {
                 if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward,
-                        out RaycastHit hit, playerEye.farClipPlane)) {
+                        out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
                     OnLeftDownCam(hit);
                 }
             }
-            if(Input.GetMouseButton(1)) {
+            if(Input.GetMouseButtonUp(1)) {
                 if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward,
-                            out RaycastHit hit, playerEye.farClipPlane)) {
+                            out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
                     OnRightUpCam(hit);
                 }
             } else if(Input.GetMouseButtonDown(1)) {
                 if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward,
-                        out RaycastHit hit, playerEye.farClipPlane)) {
+                        out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
                     OnRightDownCam(hit);
                 }
             }

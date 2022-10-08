@@ -1,7 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace SimCam
 {
@@ -10,8 +8,14 @@ namespace SimCam
     // and abstract class, though the name has not been changed.
     public abstract class ACameraControl : MonoBehaviour
     {
+        private char[] delimiterChars = { ' ', ',', '+', ':', '\t' };
+
         [SerializeField]
         protected Camera playerEye;
+
+        [SerializeField]
+        protected string layerString;
+        protected int layerMask;
 
         public delegate void CamclickHandler(RaycastHit hit);
         public static event CamclickHandler LeftholdCam;
@@ -25,6 +29,24 @@ namespace SimCam
         protected float LMouseDownAt;
         protected bool  RMouseDown;
         protected float RMouseDownAt;
+
+
+        void Awake() {
+            layerString.Trim();
+            if(layerString.Length > 0) {
+                layerMask = 0;
+                string[] layers = layerString.Split(delimiterChars);
+                for(int i = 0; i < layers.Length; i++) {
+                    try {
+                        int l = int.Parse(layers[i]);
+                        layerMask ^= 0x1 << l;
+                    } catch(Exception) {/*Ignore what is almost certainly a non-integer*/}
+                }
+            } else {
+                layerMask = 0x1;
+            }
+        }
+
 
         protected virtual void OnEnable() 
         {
