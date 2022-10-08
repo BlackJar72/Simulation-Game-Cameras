@@ -32,10 +32,11 @@ namespace SimCam {
             Cursor.lockState = CursorLockMode.Locked;
         }//*/
 
-        /*
+
         protected override void OnEnable()
          {
              Cursor.lockState = CursorLockMode.Locked;
+             playerEye.transform.position = Vector3.zero;
              base.OnEnable();
          }
 
@@ -44,7 +45,7 @@ namespace SimCam {
          {
              // Will this be needed here?  IDK.
          }
-         */
+
 
         // Update is called once per frame
         void Update()

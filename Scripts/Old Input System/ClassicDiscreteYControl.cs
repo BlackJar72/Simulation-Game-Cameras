@@ -32,9 +32,6 @@ namespace SimCam {
         private Quaternion tilt = Quaternion.identity;
         private Quaternion angle = Quaternion.identity;
 
-        public delegate void LevelChangeHandler(int level);
-        public event LevelChangeHandler LevelChanged;
-
         // TODO:  This should be based on a (game or lot specific) array of 1 or more descrete heights;
         //        that is, for a classic city-builder or strategy game one high above the world, or
         //        for a Sims style like game one for each floor of the lots highest building little
@@ -48,20 +45,22 @@ namespace SimCam {
             ChangeLevel(0);
         }
 
-        /*
-    protected override void OnEnable()
-    {
-        // TODO/FIXME: This needs to be changed for platforms other than Windows and Linux
-        Cursor.lockState = CursorLockMode.Confined;
-        base.OnEnable();
-    }
+
+        protected override void OnEnable()
+        {
+            // TODO/FIXME: This needs to be changed for platforms other than Windows and Linux
+            Cursor.lockState = CursorLockMode.Confined;
+            playerEye.transform.position = Vector3.zero;
+            zoomDist = 0f;
+            base.OnEnable();
+        }
 
 
-    protected override void OnDisable()
-    {
-        // Will this be needed here?  IDK.
-    }
-    */
+        protected override void OnDisable()
+        {
+            // Will this be needed here?  IDK.
+        }
+
 
         // Update is called once per frame
         void Update() {
@@ -127,7 +126,7 @@ namespace SimCam {
             Vector3 pos = transform.position;
             pos.y = levelHeights[level];
             transform.position = pos;
-            LevelChanged?.Invoke(level);
+            OnLevelChanged(level);
         }
 
 

@@ -23,6 +23,9 @@ namespace SimCam
         public static event CamclickHandler LeftclickCam;
         public static event CamclickHandler RightclickCam;
 
+        public delegate void LevelChangeHandler(int level);
+        public static event LevelChangeHandler LevelChanged;
+
         public Camera GetPlayerEye => GetPlayerEye;
 
         protected bool  LMouseDown;
@@ -97,6 +100,11 @@ namespace SimCam
                 RightclickCam?.Invoke(hit);
             }
             RMouseDown = false;
+        }
+
+
+        protected virtual void OnLevelChanged(int level) {
+            LevelChanged?.Invoke(level);
         }
 
     }

@@ -21,12 +21,15 @@ namespace SimCim {
         public UnityEvent<RaycastHit> RightClickUnity;
         public UnityEvent<RaycastHit> RightHoldUnity;
 
+        public UnityEvent<int> LevelChange;
+
 
         void OnEnable() {
             ACameraControl.LeftclickCam  += ForwardLeftClick;
             ACameraControl.LeftholdCam   += ForwardLeftHold;
             ACameraControl.RightclickCam += ForwardRightClick;
             ACameraControl.RightholdCam  += ForwardRightHold;
+            ACameraControl.LevelChanged  += ForwardLevelChange;
         }
 
 
@@ -35,6 +38,7 @@ namespace SimCim {
             ACameraControl.LeftholdCam   -= ForwardLeftHold;
             ACameraControl.RightclickCam -= ForwardRightClick;
             ACameraControl.RightholdCam  -= ForwardRightHold;
+            ACameraControl.LevelChanged  -= ForwardLevelChange;
         }
 
 
@@ -55,6 +59,11 @@ namespace SimCim {
 
         public void ForwardRightHold(RaycastHit hit) {
             RightHoldUnity?.Invoke(hit);
+        }
+
+
+        public void ForwardLevelChange(int level) {
+            LevelChange?.Invoke(level);
         }
     }
 

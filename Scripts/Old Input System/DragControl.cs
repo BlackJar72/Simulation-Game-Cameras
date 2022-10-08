@@ -2,16 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SimCam
-{
+namespace SimCam {
 
-    /**
-    This is for moving the camera in a way typical of most classic and many
-    modern simulation, god, and rts games.  Basically, hover and a hieght and 
-    use keys or on-screen buttons to rotate and possible raise/lower the camera.
-    */
-    public class ClassicControl : ACameraControl
-    {
+    public class DragControl : ACameraControl {
         [SerializeField]
         private float rotationSpeed = 60;
         [SerializeField]
@@ -45,7 +38,7 @@ namespace SimCam
         }
 
 
-        protected override void OnEnable() 
+        protected override void OnEnable()
         {
             // TODO/FIXME: This needs to be changed for platforms other than Windows and Linux
             Cursor.lockState = CursorLockMode.Confined;
@@ -74,11 +67,20 @@ namespace SimCam
 
 
         void AdjustHeading() {
-            float rotation = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
-            headingAngle += rotation;
-            if(headingAngle > 360) headingAngle-= 360;
-            else if(headingAngle < 0) headingAngle += 360;
-            heading = Quaternion.Euler(0, headingAngle, 0);
+            if(RMouseDown) {
+                Vector3 mpos = Input.mousePosition;
+                mpos.x -= Screen.width  / 2f;
+                mpos.y -= Screen.height / 2f;
+                Vector3 mvel = Vector3.zero;
+                if(mpos.magnitude > 0) mpos.Normalize();
+                mvel.x = Input.GetAxis("Mouse X");
+                mvel.y = Input.GetAxis("Mouse Y");
+                float rotation = Vector3.Cross(mpos, mvel).z;
+                headingAngle += rotation * 2;
+                if (headingAngle > 360) headingAngle -= 360;
+                else if (headingAngle < 0) headingAngle += 360;
+                heading = Quaternion.Euler(0, headingAngle, 0);
+            }
         }
 
 
@@ -98,24 +100,18 @@ namespace SimCam
 
         void Move() {
             movement = Vector3.zero;
-            mousePos = Input.mousePosition;
-            if(mousePos.y <= windowBoundarySize) {
-                movement.z = -1;
-            } else if(mousePos.y >= (Screen.height - windowBoundarySize)) {
-                movement.z = 1;
+            if(LMouseDown) {
+                movement.x =  -Input.GetAxis("Mouse X");
+                movement.z =  -Input.GetAxis("Mouse Y");
+                movement.y = 0;
+                movement = heading * movement;
+                if (Input.GetKey(KeyCode.LeftShift)) movement.y -= Time.deltaTime;
+                if (Input.GetKey(KeyCode.Space)) movement.y += Time.deltaTime;
+                //movement.Normalize();
+                //movement *= moveSpeed;
+                //movement *= Time.deltaTime;
+                transform.Translate(movement, Space.World);
             }
-            if(mousePos.x <= windowBoundarySize) {
-                movement.x = -1;
-            } else if(mousePos.x >= (Screen.width - windowBoundarySize)) {
-                movement.x = 1;
-            }
-            movement = heading * movement;
-            if(Input.GetKey(KeyCode.LeftShift)) movement.y -= 1;
-            if(Input.GetKey(KeyCode.Space)) movement.y += 1;
-            movement.Normalize();
-            movement *= moveSpeed ;
-            movement *= Time.deltaTime;
-            transform.Translate(movement, Space.World);
         }
 
 
