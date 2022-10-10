@@ -11,10 +11,22 @@ namespace SimCam {
     public class FreeCamControl : ACameraControl
     {
         [SerializeField]
-        private float rotationSpeed = 5;
+        private float rotationSpeed = 5f;
         [SerializeField]
-        private float moveSpeed = 1;
+        private float moveSpeed = 5f;
 
+        [SerializeField]
+        private float minMoveSpeed = 0.5f;
+        [SerializeField]
+        private float maxMoveSpeed = 50f;
+        [SerializeField]
+        private float fullAccelTime = 30;
+
+        private float moveSpeedLog;
+        private float minSpeedLog;
+        private float maxSpeedLog;
+        private float moveSpeedFactor;
+        private float moveSpeedIncrement;
 
 
         //*
@@ -23,6 +35,15 @@ namespace SimCam {
         {
             Cursor.lockState = CursorLockMode.Locked;
         }//*/
+
+
+        void Awake() {
+            moveSpeedFactor = moveSpeed;
+            moveSpeedLog = 0;
+            minSpeedLog = (Mathf.Log(minMoveSpeed / moveSpeedFactor));
+            maxSpeedLog = (Mathf.Log(maxMoveSpeed / moveSpeedFactor));
+            moveSpeedIncrement = (maxSpeedLog - minSpeedLog) / fullAccelTime;
+        }
 
 
         protected override void OnEnable()
@@ -46,8 +67,18 @@ namespace SimCam {
             AdjustHeading();
             AdjustPitch();
             SetRotation();
+            Accelerate();
             Move();
             CheckClicks();
+        }
+
+
+        void Accelerate() {
+            float change = Input.mouseScrollDelta.y;
+            moveSpeedLog += change * moveSpeedIncrement * Time.deltaTime;
+            if(moveSpeedLog > maxSpeedLog) moveSpeedLog = maxSpeedLog;
+            else if(moveSpeedLog < minSpeedLog) moveSpeedLog = minSpeedLog;
+            moveSpeed = Mathf.Pow(10, moveSpeedLog) * moveSpeedFactor;
         }
 
 
