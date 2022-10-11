@@ -11,7 +11,7 @@ namespace SimCam {
     /*
     A new approach, WIP>
     TODO: THIS!
-    *
+    */
     /// <summary>
     /// A single class camera controller with all functionality and the ability to
     /// build custom behavior combinations through delegate arrays (populated through
