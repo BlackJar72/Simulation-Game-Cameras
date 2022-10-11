@@ -64,7 +64,7 @@ namespace SimCam {
 
 
         [SerializeField]
-        private float rotationSpeed = 5;
+        private float rotationSpeed = 5; // 60?
         [SerializeField]
         private float moveSpeed = 1;
 
@@ -74,11 +74,6 @@ namespace SimCam {
         private float maxMoveSpeed = 50f;
         [SerializeField]
         private float accellerationFactor = 1;
-
-        [SerializeField]
-        private float rotationSpeed = 60;
-        [SerializeField]
-        private float moveSpeed = 1;
         [SerializeField]
         private int windowBoundarySize = 10;
         [SerializeField]
@@ -100,6 +95,55 @@ namespace SimCam {
         void Update() {
 
         }
+
+
+        #region events
+
+
+
+        protected virtual void OnLeftDownCam(RaycastHit hit) {
+            //Debug.Log("Left button down!");
+            if(!LMouseDown) {
+                LMouseDown = true;
+                LMouseDownAt = Time.time;
+            }
+            LeftholdCam?.Invoke(hit);
+        }
+
+
+        protected virtual void OnRightDownCam(RaycastHit hit) {
+            if(!RMouseDown) {
+                RMouseDown = true;
+                RMouseDownAt = Time.time;
+            }
+            RightholdCam?.Invoke(hit);
+        }
+
+
+        protected virtual void OnLeftUpCam(RaycastHit hit) {
+            //Debug.Log("Left button up!");
+            if(LMouseDown && (((LMouseDownAt + 0.5f) > Time.time))) {
+                LMouseDownAt -= 0.5f;
+                LeftclickCam?.Invoke(hit);
+            }
+            LMouseDown = false;
+        }
+
+
+        protected virtual void OnRightUpCam(RaycastHit hit) {
+            if(RMouseDown && (((RMouseDownAt + 0.5f) > Time.time))) {
+                RMouseDownAt -= 0.5f;
+                RightclickCam?.Invoke(hit);
+            }
+            RMouseDown = false;
+        }
+
+
+        protected virtual void OnLevelChanged(int level) {
+            LevelChanged?.Invoke(level);
+        }
+
+        #endregion
 
 
         #region Angle Controls
@@ -202,6 +246,17 @@ namespace SimCam {
             movement *= moveSpeed;
             movement *= Time.deltaTime;
             transform.Translate(movement, Space.World);
+        }
+
+
+        void ChangeLevel(int change) {
+            level += change;
+            if(level < 0) level = 0;
+            else if(level >= levelHeights.Length) level = levelHeights.Length - 1;
+            Vector3 pos = transform.position;
+            pos.y = levelHeights[level];
+            transform.position = pos;
+            OnLevelChanged(level);
         }
 
 
