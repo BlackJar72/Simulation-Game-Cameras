@@ -20,12 +20,25 @@ namespace SimCam
         private int windowBoundarySize = 10;
         [SerializeField]
         private float minZoomDist = 10, maxZoomDist = -50;
+        [SerializeField]
+        private float floorY = 0;
+
+
+        private Vector3 pivot, camproj, twod, newpos;
 
 
         // TODO:  This should be based on a (game or lot specific) array of 1 or more descrete heights;
         //        that is, for a classic city-builder or strategy game one high above the world, or
         //        for a Sims style like game one for each floor of the lots highest building little
         //        above those floors -- etc, as other possibilities are hypothetically possible.
+
+
+        void Awake() {
+            pivot   = new Vector3(0, floorY, 0);
+            camproj = new Vector3(0, floorY, 0);
+            twod    = new Vector3(0, floorY, 0);
+            newpos  = new Vector3(0, floorY, 0);
+        }
 
 
         // Start is called before the first frame update
@@ -65,12 +78,29 @@ namespace SimCam
         }
 
 
+        protected void FindPivot() {
+            float a = transform.forward.x / transform.forward.y;
+            float b = transform.forward.z / transform.forward.y;
+            pivot.x = transform.position.x + (a * (pivot.y - transform.position.y));
+            pivot.z = transform.position.z + (b * (pivot.y - transform.position.y));
+            camproj.x = transform.position.x - pivot.x;
+            camproj.y = pivot.y;
+            camproj.z = transform.position.z - pivot.z;
+        }
+
+
+
         void AdjustHeading() {
             float rotation = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
-            headingAngle += rotation;
-            if(headingAngle > 360) headingAngle-= 360;
-            else if(headingAngle < 0) headingAngle += 360;
-            heading = Quaternion.Euler(0, headingAngle, 0);
+            FindPivot();
+            Quaternion q = Quaternion.Euler(0, -rotation, 0);
+            camproj = q * camproj;
+            newpos = pivot + camproj;
+            newpos.y = transform.position.y;
+            transform.position = newpos;
+            transform.LookAt(pivot);
+            heading = heading * q;
+            headingAngle = Quaternion.Angle(heading, Quaternion.identity);
         }
 
 

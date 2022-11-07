@@ -18,9 +18,14 @@ namespace SimCam {
         [SerializeField]
         private float minZoomDist = 10, maxZoomDist = -50;
 
-        [SerializeField][Tooltip("Altitude (Y coordinates) for levels; must have at least one valid value.")]
+        [SerializeField][Tooltip("Camera holder Y coordinates for levels; must have at least one valid value.")]
         private float[] levelHeights;
         private int level = 0;
+        [SerializeField][Tooltip("Floor Y coordinates for levels; should be the same size as level heights.")]
+        private float[] floorHeights;
+
+
+        private Vector3 pivot, camproj, twod, newpos;
 
 
 
@@ -28,6 +33,26 @@ namespace SimCam {
         //        that is, for a classic city-builder or strategy game one high above the world, or
         //        for a Sims style like game one for each floor of the lots highest building little
         //        above those floors -- etc, as other possibilities are hypothetically possible.
+
+
+        void Awake() {
+            if((floorHeights == null) || (floorHeights.Length != levelHeights.Length)) {
+                float[] tmpFloorYs = floorHeights;
+                floorHeights = new float[levelHeights.Length];
+                for(int i = 0; i <= levelHeights.Length; i++) {
+                    floorHeights[i] = tmpFloorYs[i];
+                }
+            }
+            for(int i = 0; i < floorHeights.Length; i++) {
+                if(floorHeights[i] >= (levelHeights[i] - minZoomDist)) {
+                    floorHeights[i] =  levelHeights[i] - minZoomDist;
+                }
+            }
+            pivot   = new Vector3(0, floorHeights[level], 0);
+            camproj = new Vector3(0, floorHeights[level], 0);
+            twod    = new Vector3(0, floorHeights[level], 0);
+            newpos  = new Vector3(0, floorHeights[level], 0);
+        }
 
 
         // Start is called before the first frame update
@@ -67,12 +92,29 @@ namespace SimCam {
         }
 
 
+        protected void FindPivot() {
+            float a = transform.forward.x / transform.forward.y;
+            float b = transform.forward.z / transform.forward.y;
+            pivot.x = transform.position.x + (a * (pivot.y - transform.position.y));
+            pivot.z = transform.position.z + (b * (pivot.y - transform.position.y));
+            camproj.x = transform.position.x - pivot.x;
+            camproj.y = pivot.y;
+            camproj.z = transform.position.z - pivot.z;
+        }
+
+
+
         void AdjustHeading() {
             float rotation = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
-            headingAngle += rotation;
-            if (headingAngle > 360) headingAngle -= 360;
-            else if (headingAngle < 0) headingAngle += 360;
-            heading = Quaternion.Euler(0, headingAngle, 0);
+            FindPivot();
+            Quaternion q = Quaternion.Euler(0, -rotation, 0);
+            camproj = q * camproj;
+            newpos = pivot + camproj;
+            newpos.y = transform.position.y;
+            transform.position = newpos;
+            transform.LookAt(pivot);
+            heading = heading * q;
+            headingAngle = Quaternion.Angle(heading, Quaternion.identity);
         }
 
 
@@ -120,6 +162,7 @@ namespace SimCam {
             Vector3 pos = transform.position;
             pos.y = levelHeights[level];
             transform.position = pos;
+            pivot.y = camproj.y = twod.y = newpos.y = floorHeights[level];
             OnLevelChanged(level);
         }
 
