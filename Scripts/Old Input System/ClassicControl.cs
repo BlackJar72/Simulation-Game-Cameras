@@ -18,10 +18,16 @@ namespace SimCam
         private float moveSpeed = 1;
         [SerializeField]
         private int windowBoundarySize = 10;
-        [SerializeField]
-        private float minZoomDist = 10, maxZoomDist = -50;
+        [SerializeField][Min(0f)]
+        private float minZoomDist = 10;
+        [SerializeField][Min(0f)]
+        private float maxZoomDist = 50;
         [SerializeField]
         private float floorY = 0;
+        [SerializeField][Min(0f)]
+        private float minPitch = 10;
+        [SerializeField][Min(0f)]
+        private float maxPitch = 90;
 
 
         private Vector3 pivot, camproj, twod, newpos;
@@ -53,8 +59,15 @@ namespace SimCam
         {
             // TODO/FIXME: This needs to be changed for platforms other than Windows and Linux
             Cursor.lockState = CursorLockMode.Confined;
-            playerEye.transform.localPosition = Vector3.zero;
-            zoomDist = 0f;
+            tiltAngle = Mathf.Clamp(tiltAngle, minPitch, maxPitch);
+            tilt = Quaternion.Euler(tiltAngle, 0, 0);
+            SetRotation();
+            FindPivot();
+            zoomDist = (transform.position - pivot).magnitude;
+            transform.position = pivot;
+            Zoom();
+            //playerEye.transform.localPosition = Vector3.zero;
+            //zoomDist = 0f;
             base.OnEnable();
         }
 
@@ -95,27 +108,19 @@ namespace SimCam
         }
 
 
-
         void AdjustHeading() {
             float rotation = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
-            FindPivot();
-            if(transform.forward.y != 0f) {
-                rotation = -rotation;
-            }
-            Quaternion q = Quaternion.Euler(0, rotation, 0);
-            camproj = q * camproj;
-            newpos = pivot + camproj;
-            newpos.y = transform.position.y;
-            transform.position = newpos;
-            heading = heading * q;
-            headingAngle = Quaternion.Angle(heading, Quaternion.identity);
+            headingAngle -= rotation;
+            if(headingAngle > 360) headingAngle-= 360;
+            else if(headingAngle < 0) headingAngle += 360;
+            heading = Quaternion.Euler(0, headingAngle, 0);
         }
 
 
         void AdjustPitch() {
             float rotation = Input.GetAxis("Vertical") * rotationSpeed * Time.deltaTime;
-            tiltAngle -= rotation;
-            tiltAngle = Mathf.Clamp(tiltAngle, 0, 90);
+            tiltAngle += rotation;
+            tiltAngle = Mathf.Clamp(tiltAngle, minPitch, maxPitch);
             tilt = Quaternion.Euler(tiltAngle, 0, 0);
         }
 
@@ -151,10 +156,9 @@ namespace SimCam
 
         void Zoom() {
             float change = Input.mouseScrollDelta.y;
-            zoomDist += change;
-            // Due to the direction of movement, max and min are swapped here
-            zoomDist = Mathf.Clamp(zoomDist, maxZoomDist, minZoomDist);
-            playerEye.transform.localPosition = Vector3.forward * zoomDist;
+            zoomDist -= change;
+            zoomDist = Mathf.Clamp(zoomDist, minZoomDist, maxZoomDist);
+            playerEye.transform.localPosition = -(Vector3.forward * zoomDist);
         }
 
 
