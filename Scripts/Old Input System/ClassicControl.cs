@@ -32,7 +32,7 @@ namespace SimCam
         private float maxPitch = 90;
 
 
-        private Vector3 pivot;
+        private Vector3 pivot, tpos;
 
 
         // TODO:  This should be based on a (game or lot specific) array of 1 or more descrete heights;
@@ -142,6 +142,11 @@ namespace SimCam
             movement *= moveSpeed ;
             movement *= Time.deltaTime;
             transform.Translate(movement, Space.World);
+            if(transform.position.y < floorY) {
+                tpos = transform.position;
+                tpos.y = floorY;
+                transform.position = tpos;
+            }
         }
 
 

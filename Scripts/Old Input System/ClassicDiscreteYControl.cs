@@ -42,6 +42,10 @@ namespace SimCam {
 
 
         void Awake() {
+            if((levelHeights == null) || (levelHeights.Length < 1)) {
+                levelHeights = new float[1];
+                levelHeights[0] = 0f;
+            }
             pivot   = new Vector3(transform.position.x, levelHeights[level], transform.position.z);
         }
 
@@ -98,7 +102,7 @@ namespace SimCam {
 
         void AdjustHeading() {
             float rotation = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
-            headingAngle += rotation;
+            headingAngle -= rotation;
             if (headingAngle > 360) headingAngle -= 360;
             else if (headingAngle < 0) headingAngle += 360;
             heading = Quaternion.Euler(0, headingAngle, 0);
@@ -107,8 +111,8 @@ namespace SimCam {
 
         void AdjustPitch() {
             float rotation = Input.GetAxis("Vertical") * rotationSpeed * Time.deltaTime;
-            tiltAngle -= rotation;
-            tiltAngle = Mathf.Clamp(tiltAngle, 0, 90);
+            tiltAngle += rotation;
+            tiltAngle = Mathf.Clamp(tiltAngle, minPitch, maxPitch);
             tilt = Quaternion.Euler(tiltAngle, 0, 0);
         }
 
