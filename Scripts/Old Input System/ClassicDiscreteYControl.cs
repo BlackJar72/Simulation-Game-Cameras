@@ -116,7 +116,7 @@ namespace SimCam {
             if(transform.forward.y != 0f) {
                 rotation = -rotation;
             }
-            Quaternion q = Quaternion.Euler(0, -rotation, 0);
+            Quaternion q = Quaternion.Euler(0, rotation, 0);
             camproj = q * camproj;
             newpos = pivot + camproj;
             newpos.y = transform.position.y;
