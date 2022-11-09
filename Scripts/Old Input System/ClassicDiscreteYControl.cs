@@ -15,17 +15,23 @@ namespace SimCam {
         private float moveSpeed = 1;
         [SerializeField]
         private int windowBoundarySize = 10;
-        [SerializeField]
-        private float minZoomDist = 10, maxZoomDist = -50;
+        [SerializeField][Min(0f)]
+        private float minZoomDist = 10;
+        [SerializeField][Min(0f)]
+        private float baseZoomDist = 10;
+        [SerializeField][Min(0f)]
+        private float maxZoomDist = 50;
+        [SerializeField][Min(0f)]
+        private float minPitch = 10;
+        [SerializeField][Min(0f)]
+        private float maxPitch = 90;
 
         [SerializeField][Tooltip("Camera holder Y coordinates for levels; must have at least one valid value.")]
         private float[] levelHeights;
         private int level = 0;
-        [SerializeField][Tooltip("Floor Y coordinates for levels; should be the same size as level heights.")]
-        private float[] floorHeights;
 
 
-        private Vector3 pivot, camproj, twod, newpos;
+        private Vector3 pivot;
 
 
 
@@ -36,22 +42,7 @@ namespace SimCam {
 
 
         void Awake() {
-            if((floorHeights == null) || (floorHeights.Length != levelHeights.Length)) {
-                float[] tmpFloorYs = floorHeights;
-                floorHeights = new float[levelHeights.Length];
-                for(int i = 0; i <= levelHeights.Length; i++) {
-                    floorHeights[i] = tmpFloorYs[i];
-                }
-            }
-            for(int i = 0; i < floorHeights.Length; i++) {
-                if(floorHeights[i] >= (levelHeights[i] - minZoomDist)) {
-                    floorHeights[i] =  levelHeights[i] - minZoomDist;
-                }
-            }
-            pivot   = new Vector3(0, floorHeights[level], 0);
-            camproj = new Vector3(0, floorHeights[level], 0);
-            twod    = new Vector3(0, floorHeights[level], 0);
-            newpos  = new Vector3(0, floorHeights[level], 0);
+            pivot   = new Vector3(transform.position.x, levelHeights[level], transform.position.z);
         }
 
 
@@ -67,9 +58,14 @@ namespace SimCam {
         {
             // TODO/FIXME: This needs to be changed for platforms other than Windows and Linux
             Cursor.lockState = CursorLockMode.Confined;
-            playerEye.transform.localPosition = Vector3.zero;
-            ChangeLevel(0);
-            zoomDist = 0f;
+
+            tiltAngle = Mathf.Clamp(tiltAngle, minPitch, maxPitch);
+            tilt = Quaternion.Euler(tiltAngle, 0, 0);
+            SetRotation();
+
+            zoomDist = baseZoomDist;
+            Zoom();
+
             base.OnEnable();
         }
 
@@ -93,36 +89,19 @@ namespace SimCam {
 
 
         protected void FindPivot() {
-            if(transform.forward.y != 0f) {
-                float a = transform.forward.x / transform.forward.y;
-                float b = transform.forward.z / transform.forward.y;
-                pivot.x = transform.position.x + (a * (pivot.y - transform.position.y));
-                pivot.y = camproj.y = twod.y = newpos.y = floorHeights[level];
-                pivot.z = transform.position.z + (b * (pivot.y - transform.position.y));
-            } else {
-                pivot = playerEye.transform.position;
-                camproj.y = twod.y = newpos.y = pivot.y;
-            }
-            camproj.x = transform.position.x - pivot.x;
-            camproj.y = pivot.y;
-            camproj.z = transform.position.z - pivot.z;
+            float a = transform.forward.x / transform.forward.y;
+            float b = transform.forward.z / transform.forward.y;
+            pivot.x = transform.position.x + (a * (pivot.y - transform.position.y));
+            pivot.z = transform.position.z + (b * (pivot.y - transform.position.y));
         }
-
 
 
         void AdjustHeading() {
             float rotation = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
-            FindPivot();
-            if(transform.forward.y != 0f) {
-                rotation = -rotation;
-            }
-            Quaternion q = Quaternion.Euler(0, rotation, 0);
-            camproj = q * camproj;
-            newpos = pivot + camproj;
-            newpos.y = transform.position.y;
-            transform.position = newpos;
-            heading = heading * q;
-            headingAngle = Quaternion.Angle(heading, Quaternion.identity);
+            headingAngle += rotation;
+            if (headingAngle > 360) headingAngle -= 360;
+            else if (headingAngle < 0) headingAngle += 360;
+            heading = Quaternion.Euler(0, headingAngle, 0);
         }
 
 
@@ -143,21 +122,21 @@ namespace SimCam {
         void Move() {
             movement = Vector3.zero;
             mousePos = Input.mousePosition;
-            if (mousePos.y <= windowBoundarySize) {
+            if(mousePos.y <= windowBoundarySize) {
                 movement.z = -1;
-            } else if (mousePos.y >= (Screen.height - windowBoundarySize)) {
+            } else if(mousePos.y >= (Screen.height - windowBoundarySize)) {
                 movement.z = 1;
             }
-            if (mousePos.x <= windowBoundarySize) {
+            if(mousePos.x <= windowBoundarySize) {
                 movement.x = -1;
-            } else if (mousePos.x >= (Screen.width - windowBoundarySize)) {
+            } else if(mousePos.x >= (Screen.width - windowBoundarySize)) {
                 movement.x = 1;
             }
             movement = heading * movement;
             if (Input.GetKeyUp(KeyCode.Q)) ChangeLevel(-1);
             if (Input.GetKeyUp(KeyCode.E)) ChangeLevel(1);
             movement.Normalize();
-            movement *= moveSpeed;
+            movement *= moveSpeed ;
             movement *= Time.deltaTime;
             transform.Translate(movement, Space.World);
         }
@@ -170,17 +149,17 @@ namespace SimCam {
             Vector3 pos = transform.position;
             pos.y = levelHeights[level];
             transform.position = pos;
-            pivot.y = camproj.y = twod.y = newpos.y = floorHeights[level];
+            pivot.y = levelHeights[level];
+            Zoom();
             OnLevelChanged(level);
         }
 
 
         void Zoom() {
             float change = Input.mouseScrollDelta.y;
-            zoomDist += change;
-            // Due to the direction of movement, max and min are swapped here
-            zoomDist = Mathf.Clamp(zoomDist, maxZoomDist, minZoomDist);
-            playerEye.transform.localPosition = Vector3.forward * zoomDist;
+            zoomDist -= change;
+            zoomDist = Mathf.Clamp(zoomDist, minZoomDist, maxZoomDist);
+            playerEye.transform.localPosition = -(Vector3.forward * zoomDist);
         }
 
 
@@ -208,8 +187,8 @@ namespace SimCam {
                 }
             }
             if (Input.GetMouseButtonUp(2)) {
-                zoomDist = 0f;
-                playerEye.transform.localPosition = Vector3.zero;
+                zoomDist = baseZoomDist;
+                Zoom();
             }
         }
 

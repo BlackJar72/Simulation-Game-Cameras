@@ -52,6 +52,7 @@ namespace SimCam
        protected override void OnEnable()
         {
             Cursor.lockState = CursorLockMode.Locked;
+            transform.position = playerEye.transform.position;
             playerEye.transform.localPosition = Vector3.zero;
             base.OnEnable();
         }
