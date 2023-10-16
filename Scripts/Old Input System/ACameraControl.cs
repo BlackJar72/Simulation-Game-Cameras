@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace SimCam
@@ -10,12 +9,11 @@ namespace SimCam
     {
         private char[] delimiterChars = { ' ', ',', '+', ':', '\t' };
 
-        [SerializeField]
-        protected Camera playerEye;
+        [SerializeField] protected Camera playerEye;
+        [SerializeField] protected GameObject groundPlain;
+        [SerializeField] protected LayerMask groundPlainMask;
 
-        [SerializeField]
-        protected string layerString;
-        protected int layerMask;
+        [SerializeField] protected LayerMask layerMask = 0x1;
 
         public delegate void CamclickHandler(RaycastHit hit);
         public static event CamclickHandler LeftholdCam;
@@ -46,21 +44,7 @@ namespace SimCam
         protected static Quaternion angle = Quaternion.identity;
 
 
-        void Awake() {
-            layerString.Trim();
-            if(layerString.Length > 0) {
-                layerMask = 0;
-                string[] layers = layerString.Split(delimiterChars);
-                for(int i = 0; i < layers.Length; i++) {
-                    try {
-                        int l = int.Parse(layers[i]);
-                        layerMask ^= 0x1 << l;
-                    } catch(Exception) {/*Ignore what is almost certainly a non-integer*/}
-                }
-            } else {
-                layerMask = 0x1;
-            }
-        }
+        void Awake() {/* Do something...? */}
 
 
         protected virtual void OnEnable() 
@@ -118,6 +102,23 @@ namespace SimCam
         protected virtual void OnLevelChanged(int level) {
             LevelChanged?.Invoke(level);
         }
+
+
+        /// <summary>
+        /// This gets the position currently under under the cursor (center screen for first-person
+        /// views).  This is intended for situations when some element most be moved constantly,
+        /// such as an effected spot marker.  It needs to be nullable in case moved off the area.
+        /// </summary>
+        /// <returns></returns>
+        public abstract Vector3? GetCursorLocation();
+
+
+        /// <summary>
+        /// This gets the game object currently under under the cursor (center screen for first-person
+        /// views).
+        /// </summary>
+        /// <returns></returns>
+        public abstract GameObject GetCursorObject();
 
     }
 

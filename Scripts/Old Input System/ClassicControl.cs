@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SimCam
@@ -12,6 +10,7 @@ namespace SimCam
     */
     public class ClassicControl : ACameraControl
     {
+
         [SerializeField]
         private float rotationSpeed = 60;
         [SerializeField]
@@ -33,6 +32,9 @@ namespace SimCam
 
 
         private Vector3 pivot, tpos;
+
+        [SerializeField]
+        private LayerMask UILayer;
 
 
         // TODO:  This should be based on a (game or lot specific) array of 1 or more descrete heights;
@@ -186,6 +188,37 @@ namespace SimCam
                 Zoom();
             }
         }
+
+
+        public override Vector3? GetCursorLocation() {
+            Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
+            // Don't give a world position if on the UI
+            RaycastHit hit;
+            if(Physics.Raycast(ray, out hit, float.PositiveInfinity, UILayer)) {
+                return null;
+            }
+            if(Physics.Raycast(ray, out hit, playerEye.farClipPlane, groundPlainMask)) {
+                return hit.point;
+            }
+            // Don't give a world position if somehow off screen or not pointing a ground plain
+            return null;
+        }
+
+
+        public override GameObject GetCursorObject() {
+            Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            if(Physics.Raycast(ray, out hit, float.PositiveInfinity, UILayer)) {
+                return null;
+            }
+            if(Physics.Raycast(ray, out hit, playerEye.farClipPlane, layerMask)) {
+                return hit.collider.gameObject;
+            }
+            return null;
+        }
+
+
+
     }
 
 }

@@ -1,4 +1,3 @@
-using SimCam;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -12,7 +11,7 @@ using UnityEngine.Events;
 /// Most typically, these events would go to an manager that
 /// can decide what to do based on what is hit.
 /// </summary>
-namespace SimCim {
+namespace SimCam {
 
     public class EventConverter : MonoBehaviour {
 

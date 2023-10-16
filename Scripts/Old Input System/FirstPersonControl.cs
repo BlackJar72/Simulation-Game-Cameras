@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SimCam
@@ -14,33 +12,33 @@ namespace SimCam
     public class FirstPersonControl : ACameraControl
     {
         [SerializeField]
-        private float rotationSpeed = 5;
+        protected float rotationSpeed = 5;
         [SerializeField]
-        private float moveSpeed = 1;
+        protected float moveSpeed = 1;
 
         [SerializeField]
-        private float minMoveSpeed = 0.5f;
+        protected float minMoveSpeed = 0.5f;
         [SerializeField]
-        private float maxMoveSpeed = 50f;
+        protected float maxMoveSpeed = 50f;
         [SerializeField]
-        private float accellerationFactor = 1;
+        protected float accellerationFactor = 1;
 
-        private float moveSpeedLog;
-        private float minSpeedLog;
-        private float maxSpeedLog;
-        private float moveSpeedFactor;
-        private float moveSpeedIncrement;
+        protected float moveSpeedLog;
+        protected float minSpeedLog;
+        protected float maxSpeedLog;
+        protected float moveSpeedFactor;
+        protected float moveSpeedIncrement;
 
 
         //*
         // Start is called before the first frame update
-        void Start()
+        protected void Start()
         {
             Cursor.lockState = CursorLockMode.Locked;
         }//*/
 
 
-        void Awake() {
+        protected void Awake() {
             moveSpeedFactor = moveSpeed;
             moveSpeedLog = 0;
             minSpeedLog = (Mathf.Log10(minMoveSpeed / moveSpeedFactor));
@@ -66,7 +64,7 @@ namespace SimCam
 
 
         // Update is called once per frame
-        void Update()
+        protected void Update()
         {
             AdjustHeading();
             AdjustPitch();
@@ -77,7 +75,7 @@ namespace SimCam
         }
 
 
-        void Accelerate() {
+        protected void Accelerate() {
             float change = Input.mouseScrollDelta.y;
             moveSpeedLog += change * moveSpeedIncrement * Time.deltaTime;
             if(moveSpeedLog > maxSpeedLog) moveSpeedLog = maxSpeedLog;
@@ -86,7 +84,7 @@ namespace SimCam
         }
 
 
-        void AdjustHeading() {
+        protected void AdjustHeading() {
             float rotation = Input.GetAxis("Mouse X") * rotationSpeed;// * Time.deltaTime;
             headingAngle += rotation;
             if(headingAngle> 360) headingAngle-= 360;
@@ -95,7 +93,7 @@ namespace SimCam
         }
 
 
-        void AdjustPitch() {
+        protected void AdjustPitch() {
             float rotation = Input.GetAxis("Mouse Y") * rotationSpeed;// * Time.deltaTime;
             tiltAngle -= rotation;
             tiltAngle = Mathf.Clamp(tiltAngle, -80, 80);
@@ -103,12 +101,12 @@ namespace SimCam
         }
 
 
-        void SetRotation() {
+        protected void SetRotation() {
             transform.rotation = heading * tilt;
         }
 
 
-        void Move() {
+        protected virtual void Move() {
             movement = Vector3.zero;
             movement.z = Input.GetAxis("Vertical");
             movement.x = Input.GetAxis("Horizontal");
@@ -122,7 +120,7 @@ namespace SimCam
         }
 
 
-        void CheckClicks() {
+        protected void CheckClicks() {
             if(Input.GetMouseButtonUp(0)) {
                 if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward,
                             out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
@@ -146,6 +144,31 @@ namespace SimCam
                 }
             }
         }
+
+
+        public override Vector3? GetCursorLocation() {
+            // Being off the screen or or over the UI should not be a possibility when aiming through
+            // the center of the screen; if so you need to fix your UI!
+            if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward,
+                    out RaycastHit hit, playerEye.farClipPlane, groundPlainMask)) {
+                return hit.point;
+            }
+            return null;
+        }
+
+
+        public override GameObject GetCursorObject() {
+            // Being off the screen or or over the UI should not be a possibility when aiming through
+            // the center of the screen; if so you need to fix your UI!
+            if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward,
+                    out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
+                return hit.collider.gameObject;
+            }
+            return null;
+        }
+
+
+
 
     }
 

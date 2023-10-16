@@ -30,8 +30,10 @@ namespace SimCam {
         private float[] levelHeights;
         private int level = 0;
 
-
         private Vector3 pivot;
+
+        [SerializeField]
+        private LayerMask UILayer;
 
 
 
@@ -154,6 +156,9 @@ namespace SimCam {
             pos.y = levelHeights[level];
             transform.position = pos;
             pivot.y = levelHeights[level];
+            Vector3 newGroundPos = groundPlain.transform.position;
+            newGroundPos.y = pivot.y;
+            groundPlain.transform.position = newGroundPos;
             Zoom();
             OnLevelChanged(level);
         }
@@ -201,5 +206,35 @@ namespace SimCam {
             levelHeights = levels;
             ChangeLevel(0);
         }
+
+
+        public override Vector3? GetCursorLocation() {
+            Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
+            // Don't give a world position if on the UI
+            RaycastHit hit;
+            if(Physics.Raycast(ray, out hit, float.PositiveInfinity, UILayer)) {
+                return null;
+            }
+            if(Physics.Raycast(ray, out hit, playerEye.farClipPlane, groundPlainMask)) {
+                return hit.point;
+            }
+            // Don't give a world position if somehow off screen or not pointing a ground plain
+            return null;
+        }
+
+
+        public override GameObject GetCursorObject() {
+            Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            if(Physics.Raycast(ray, out hit, float.PositiveInfinity, UILayer)) {
+                return null;
+            }
+            if(Physics.Raycast(ray, out hit, playerEye.farClipPlane, layerMask)) {
+                return hit.collider.gameObject;
+            }
+            return null;
+        }
+
+
     }
 }

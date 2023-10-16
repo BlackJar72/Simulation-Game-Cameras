@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 namespace SimCam {
 
@@ -141,6 +139,28 @@ namespace SimCam {
                     OnRightDownCam(hit);
                 }
             }
+        }
+
+
+        public override Vector3? GetCursorLocation() {
+            // Being off the screen or or over the UI should not be a possibility when aiming through
+            // the center of the screen; if so you need to fix your UI!
+            if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward,
+                    out RaycastHit hit, playerEye.farClipPlane, groundPlainMask)) {
+                return hit.point;
+            }
+            return null;
+        }
+
+
+        public override GameObject GetCursorObject() {
+            // Being off the screen or or over the UI should not be a possibility when aiming through
+            // the center of the screen; if so you need to fix your UI!
+            if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward,
+                    out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
+                return hit.collider.gameObject;
+            }
+            return null;
         }
 
     }

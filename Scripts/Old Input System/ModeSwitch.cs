@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -41,21 +39,25 @@ namespace SimCam
         }
 
 
-        public void Increment() {
+        public ACameraControl Increment() {
             int previous = mode;
             mode++;
             if(mode >= camModes.Length) mode = 0;
             camModes[previous].enabled = false;
             camModes[mode].enabled = true;
+            // Return the current camera mode so it can be accessed elsewhere
+            return camModes[mode];
         }
 
 
-        public void Decriment() {
+        public ACameraControl Decriment() {
             int previous = mode;
             mode--;
             if(mode < 0) mode = camModes.Length - 1;
             camModes[previous].enabled = false;
             camModes[mode].enabled = true;
+            // Return the current camera mode so it can be accessed elsewhere
+            return camModes[mode];
         }
     }
 
