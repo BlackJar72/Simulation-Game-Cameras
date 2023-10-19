@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace SimCam
 {
@@ -60,6 +61,7 @@ namespace SimCam
         {
             // TODO/FIXME: This needs to be changed for platforms other than Windows and Linux
             Cursor.lockState = CursorLockMode.Confined;
+            Cursor.visible = true;
             tiltAngle = Mathf.Clamp(tiltAngle, minPitch, maxPitch);
             tilt = Quaternion.Euler(tiltAngle, 0, 0);
             SetRotation();
@@ -102,19 +104,23 @@ namespace SimCam
 
 
         void AdjustHeading() {
-            float rotation = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
-            headingAngle -= rotation;
-            if(headingAngle > 360) headingAngle-= 360;
-            else if(headingAngle < 0) headingAngle += 360;
-            heading = Quaternion.Euler(0, headingAngle, 0);
+            if(!Input.GetKey(KeyCode.LeftShift)) {
+                float rotation = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
+                headingAngle -= rotation;
+                if (headingAngle > 360) headingAngle -= 360;
+                else if (headingAngle < 0) headingAngle += 360;
+                heading = Quaternion.Euler(0, headingAngle, 0);
+            }
         }
 
 
         void AdjustPitch() {
-            float rotation = Input.GetAxis("Vertical") * rotationSpeed * Time.deltaTime;
-            tiltAngle += rotation;
-            tiltAngle = Mathf.Clamp(tiltAngle, minPitch, maxPitch);
-            tilt = Quaternion.Euler(tiltAngle, 0, 0);
+            if(!Input.GetKey(KeyCode.LeftShift)) {
+                float rotation = Input.GetAxis("Vertical") * rotationSpeed * Time.deltaTime;
+                tiltAngle += rotation;
+                tiltAngle = Mathf.Clamp(tiltAngle, minPitch, maxPitch);
+                tilt = Quaternion.Euler(tiltAngle, 0, 0);
+            }
         }
 
 
@@ -127,15 +133,20 @@ namespace SimCam
         void Move() {
             movement = Vector3.zero;
             mousePos = Input.mousePosition;
-            if(mousePos.y <= windowBoundarySize) {
-                movement.z = -1;
-            } else if(mousePos.y >= (Screen.height - windowBoundarySize)) {
-                movement.z = 1;
-            }
-            if(mousePos.x <= windowBoundarySize) {
-                movement.x = -1;
-            } else if(mousePos.x >= (Screen.width - windowBoundarySize)) {
-                movement.x = 1;
+            if(Input.GetKey(KeyCode.LeftShift)) {
+                movement.z = Mathf.Clamp(Input.GetAxis("Vertical"), -1, 1);
+                movement.x = Mathf.Clamp(Input.GetAxis("Horizontal"), -1, 1);
+            } else {
+                if (mousePos.y <= windowBoundarySize) {
+                    movement.z = -1;
+                } else if (mousePos.y >= (Screen.height - windowBoundarySize)) {
+                    movement.z = 1;
+                }
+                if (mousePos.x <= windowBoundarySize) {
+                    movement.x = -1;
+                } else if (mousePos.x >= (Screen.width - windowBoundarySize)) {
+                    movement.x = 1;
+                }
             }
             movement = heading * movement;
             if(Input.GetKey(KeyCode.LeftShift)) movement.y -= 1;
@@ -191,12 +202,13 @@ namespace SimCam
 
 
         public override Vector3? GetCursorLocation() {
-            Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
             // Don't give a world position if on the UI
+            if(EventSystem.current.IsPointerOverGameObject()) return null;
+            Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
-            if(Physics.Raycast(ray, out hit, float.PositiveInfinity, UILayer)) {
+            /*if(Physics.Raycast(ray, out hit, float.PositiveInfinity, UILayer)) {
                 return null;
-            }
+            }*/
             if(Physics.Raycast(ray, out hit, playerEye.farClipPlane, groundPlainMask)) {
                 return hit.point;
             }
@@ -206,11 +218,13 @@ namespace SimCam
 
 
         public override GameObject GetCursorObject() {
+            // Don't give a world position if on the UI
+            if(EventSystem.current.IsPointerOverGameObject()) return null;
             Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
-            if(Physics.Raycast(ray, out hit, float.PositiveInfinity, UILayer)) {
+            /*if(Physics.Raycast(ray, out hit, float.PositiveInfinity, UILayer)) {
                 return null;
-            }
+            }*/
             if(Physics.Raycast(ray, out hit, playerEye.farClipPlane, layerMask)) {
                 return hit.collider.gameObject;
             }

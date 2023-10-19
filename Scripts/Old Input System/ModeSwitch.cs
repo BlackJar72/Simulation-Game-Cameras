@@ -16,6 +16,13 @@ namespace SimCam
 
         private int mode;
 
+        public delegate void modeSwitchHandler(ACameraControl controlMode);
+        public static event modeSwitchHandler modeChanged;
+
+
+        public ACameraControl CurrentMode => camModes[mode];
+
+
         // Start is called before the first frame update
         void Awake()
         {
@@ -43,8 +50,11 @@ namespace SimCam
             int previous = mode;
             mode++;
             if(mode >= camModes.Length) mode = 0;
-            camModes[previous].enabled = false;
-            camModes[mode].enabled = true;
+            if(mode != previous) {
+                camModes[previous].enabled = false;
+                camModes[mode].enabled = true;
+                modeChanged?.Invoke(camModes[mode]);
+            }
             // Return the current camera mode so it can be accessed elsewhere
             return camModes[mode];
         }
@@ -54,8 +64,11 @@ namespace SimCam
             int previous = mode;
             mode--;
             if(mode < 0) mode = camModes.Length - 1;
-            camModes[previous].enabled = false;
-            camModes[mode].enabled = true;
+            if(mode != previous) {
+                camModes[previous].enabled = false;
+                camModes[mode].enabled = true;
+                modeChanged?.Invoke(camModes[mode]);
+            }
             // Return the current camera mode so it can be accessed elsewhere
             return camModes[mode];
         }
