@@ -24,19 +24,19 @@ namespace SimCam {
 
 
         void OnEnable() {
-            ACameraControl.LeftclickCam  += ForwardLeftClick;
-            ACameraControl.LeftholdCam   += ForwardLeftHold;
-            ACameraControl.RightclickCam += ForwardRightClick;
-            ACameraControl.RightholdCam  += ForwardRightHold;
+            ACameraControl.LeftMouseUp += ForwardLeftClick;
+            ACameraControl.LeftMouseDown += ForwardLeftHold;
+            ACameraControl.RightMouseUp += ForwardRightClick;
+            ACameraControl.RightMouseDown += ForwardRightHold;
             ACameraControl.LevelChanged  += ForwardLevelChange;
         }
 
 
         void OnDisable() {
-            ACameraControl.LeftclickCam  -= ForwardLeftClick;
-            ACameraControl.LeftholdCam   -= ForwardLeftHold;
-            ACameraControl.RightclickCam -= ForwardRightClick;
-            ACameraControl.RightholdCam  -= ForwardRightHold;
+            ACameraControl.LeftMouseUp -= ForwardLeftClick;
+            ACameraControl.LeftMouseDown -= ForwardLeftHold;
+            ACameraControl.RightMouseUp -= ForwardRightClick;
+            ACameraControl.RightMouseDown -= ForwardRightHold;
             ACameraControl.LevelChanged  -= ForwardLevelChange;
         }
 

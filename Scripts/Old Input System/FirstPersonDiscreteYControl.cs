@@ -9,7 +9,7 @@ namespace SimCam
         private int level = 0;
 
 
-        protected virtual void Move() {
+        protected override void Move() {
             base.Move();
             AdjustLevel();
         }

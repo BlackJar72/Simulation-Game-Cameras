@@ -27,7 +27,6 @@ namespace SimCam
         void Awake()
         {
             camModes = gameObject.GetComponents<ACameraControl>();
-            Debug.Log(camModes);
             mode = (int)defaultMode % (int)camModes.Length;
         }
 

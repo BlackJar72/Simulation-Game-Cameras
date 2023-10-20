@@ -15,11 +15,15 @@ namespace SimCam
 
         [SerializeField] protected LayerMask layerMask = 0x1;
 
+        protected LayerMask defaultLayerMask;
+
         public delegate void CamclickHandler(RaycastHit hit);
-        public static event CamclickHandler LeftholdCam;
-        public static event CamclickHandler RightholdCam;
-        public static event CamclickHandler LeftclickCam;
-        public static event CamclickHandler RightclickCam;
+        public static event CamclickHandler LeftMouseDown;
+        public static event CamclickHandler RightMouseDown;
+        public static event CamclickHandler LeftMouseUp;
+        public static event CamclickHandler RightMouseUp;
+        public static event CamclickHandler LeftMouseClick;
+        public static event CamclickHandler RightMouseClick;
 
         public delegate void LevelChangeHandler(int level);
         public static event LevelChangeHandler LevelChanged;
@@ -44,7 +48,9 @@ namespace SimCam
         protected static Quaternion angle = Quaternion.identity;
 
 
-        void Awake() {/* Do something...? */}
+        void Awake() {
+            defaultLayerMask = layerMask;
+        }
 
 
         protected virtual void OnEnable() 
@@ -67,7 +73,7 @@ namespace SimCam
                 LMouseDown = true;
                 LMouseDownAt = Time.time;
             }
-            LeftholdCam?.Invoke(hit);
+            LeftMouseDown?.Invoke(hit);
         }
 
 
@@ -76,7 +82,7 @@ namespace SimCam
                 RMouseDown = true;
                 RMouseDownAt = Time.time;
             }
-            RightholdCam?.Invoke(hit);
+            RightMouseDown.Invoke(hit);
         }
 
 
@@ -84,7 +90,9 @@ namespace SimCam
             //Debug.Log("Left button up!");
             if(LMouseDown && (((LMouseDownAt + 0.5f) > Time.time))) {
                 LMouseDownAt -= 0.5f;
-                LeftclickCam?.Invoke(hit);
+                LeftMouseClick?.Invoke(hit);
+            } else {
+                LeftMouseUp?.Invoke(hit);
             }
             LMouseDown = false;
         }
@@ -93,7 +101,9 @@ namespace SimCam
         protected virtual void OnRightUpCam(RaycastHit hit) {
             if(RMouseDown && (((RMouseDownAt + 0.5f) > Time.time))) {
                 RMouseDownAt -= 0.5f;
-                RightclickCam?.Invoke(hit);
+                RightMouseClick?.Invoke(hit);
+            } else {
+                RightMouseUp?.Invoke(hit);
             }
             RMouseDown = false;
         }
@@ -119,6 +129,16 @@ namespace SimCam
         /// </summary>
         /// <returns></returns>
         public abstract GameObject GetCursorObject();
+
+
+        public virtual void SetLayerMask(LayerMask mask) {
+            layerMask = mask;
+        }
+
+
+        public virtual void ResetLayerMask() {
+            layerMask = defaultLayerMask;
+        }
 
     }
 
