@@ -13,6 +13,7 @@ namespace SimCam
         public ACameraControl[] camModes;
 
         [SerializeField] uint defaultMode;
+        [SerializeField] KeyCode nextMode = KeyCode.F;
 
         private int mode;
 
@@ -34,7 +35,7 @@ namespace SimCam
         // Update is called once per frame
         void Update()
         {
-            if(Input.GetKeyDown(KeyCode.F)) {
+            if(Input.GetKeyDown(nextMode)) {
                 Increment();
             }
         }
