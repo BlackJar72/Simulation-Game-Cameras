@@ -1,43 +1,42 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-
-namespace SimCam {
+namespace SimCam
+{
 
     /**
     This is for moving the camera in a way typical of most classic and many
-    modern simulation, god, and rts games.  Basically, hover and a hieght and
+    modern simulation, god, and rts games.  Basically, hover and a hieght and 
     use keys or on-screen buttons to rotate and possible raise/lower the camera.
     */
-    public class ClassicDiscreteYControl : ACameraControl {
+    public class ClassicControl : ACameraControl
+    {
+
         [SerializeField]
         private float rotationSpeed = 60;
         [SerializeField]
         private float moveSpeed = 1;
-        [SerializeField]
-        private int windowBoundarySize = 10;
         [SerializeField][Min(0f)]
         private float minZoomDist = 10;
         [SerializeField][Min(0f)]
         private float baseZoomDist = 10;
         [SerializeField][Min(0f)]
         private float maxZoomDist = 50;
+        [SerializeField]
+        private float floorY = 0;
         [SerializeField][Min(0f)]
         private float minPitch = 10;
         [SerializeField][Min(0f)]
         private float maxPitch = 90;
 
-        [SerializeField][Tooltip("Camera holder Y coordinates for levels; must have at least one valid value.")]
-        private float[] levelHeights;
-        private int level = 0;
 
-        private Vector3 pivot;
+        private Vector3 pivot, tpos;
 
-        [SerializeField] KeyCode moveMode = KeyCode.LeftControl;
+        [SerializeField] KeyCode moveMode = KeyCode.LeftShift;
         private bool inMoveMode;
-        [SerializeField] KeyCode goDown = KeyCode.Q;
-        [SerializeField] KeyCode goUp = KeyCode.E;
 
+        [SerializeField] protected KeyCode flyUp =  KeyCode.E;
+        [SerializeField] protected KeyCode flyDown = KeyCode.Q;
 
 
         // TODO:  This should be based on a (game or lot specific) array of 1 or more descrete heights;
@@ -47,35 +46,32 @@ namespace SimCam {
 
 
         void Awake() {
-            if((levelHeights == null) || (levelHeights.Length < 1)) {
-                levelHeights = new float[1];
-                levelHeights[0] = 0f;
-            }
-            pivot   = new Vector3(transform.position.x, levelHeights[level], transform.position.z);
+            pivot   = new Vector3(transform.position.x, floorY, transform.position.z);
         }
 
 
         // Start is called before the first frame update
-        void Start() {
+        void Start()
+        {
             // TODO/FIXME: This needs to be changed for platforms other than Windows and Linux
             Cursor.lockState = CursorLockMode.Confined;
-            ChangeLevel(0);
         }
 
 
-        protected override void OnEnable()
+        protected override void OnEnable() 
         {
             // TODO/FIXME: This needs to be changed for platforms other than Windows and Linux
             Cursor.lockState = CursorLockMode.Confined;
             Cursor.visible = true;
-
             tiltAngle = Mathf.Clamp(tiltAngle, minPitch, maxPitch);
             tilt = Quaternion.Euler(tiltAngle, 0, 0);
             SetRotation();
-
-            zoomDist = baseZoomDist;
+            FindPivot();
+            zoomDist = (transform.position - pivot).magnitude;
+            transform.position = pivot;
             Zoom();
-
+            //playerEye.transform.localPosition = Vector3.zero;
+            //zoomDist = 0f;
             base.OnEnable();
         }
 
@@ -143,28 +139,17 @@ namespace SimCam {
                 movement.x = Mathf.Clamp(Input.GetAxis("Horizontal"), -1, 1);
             }
             movement = heading * movement;
-            if (Input.GetKeyUp(goDown)) ChangeLevel(-1);
-            if (Input.GetKeyUp(goUp)) ChangeLevel(1);
+            if(Input.GetKey(flyDown)) movement.y -= 1;
+            if(Input.GetKey(flyUp)) movement.y += 1;
             movement.Normalize();
-            movement *= moveSpeed ;
+            movement *= moveSpeed;
             movement *= Time.deltaTime;
             transform.Translate(movement, Space.World);
-        }
-
-
-        void ChangeLevel(int change) {
-            level += change;
-            if(level < 0) level = 0;
-            else if(level >= levelHeights.Length) level = levelHeights.Length - 1;
-            Vector3 pos = transform.position;
-            pos.y = levelHeights[level];
-            transform.position = pos;
-            pivot.y = levelHeights[level];
-            Vector3 newGroundPos = groundPlain.transform.position;
-            newGroundPos.y = pivot.y;
-            groundPlain.transform.position = newGroundPos;
-            Zoom();
-            OnLevelChanged(level);
+            if(transform.position.y < floorY) {
+                tpos = transform.position;
+                tpos.y = floorY;
+                transform.position = tpos;
+            }
         }
 
 
@@ -177,38 +162,32 @@ namespace SimCam {
 
 
         void CheckClicks() {
-            if (Input.GetMouseButtonUp(0)) {
+            if(Input.GetMouseButtonUp(0)) {
                 Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
+                if(Physics.Raycast(ray, out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
                     OnLeftUpCam(hit);
                 }
-            } else if (Input.GetMouseButtonDown(0)) {
+            } else if(Input.GetMouseButtonDown(0)) {
                 Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
+                if(Physics.Raycast(ray, out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
                     OnLeftDownCam(hit);
                 }
             }
-            if (Input.GetMouseButtonUp(1)) {
+            if(Input.GetMouseButtonUp(1)) {
                 Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
+                if(Physics.Raycast(ray, out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
                     OnRightUpCam(hit);
                 }
-            } else if (Input.GetMouseButtonDown(1)) {
+            } else if(Input.GetMouseButtonDown(1)) {
                 Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
                     OnRightDownCam(hit);
                 }
             }
-            if (Input.GetMouseButtonUp(2)) {
+            if(Input.GetMouseButtonUp(2)) {
                 zoomDist = baseZoomDist;
                 Zoom();
             }
-        }
-
-
-        public void SetLevels(float[] levels) {
-            levelHeights = levels;
-            ChangeLevel(0);
         }
 
 
@@ -217,6 +196,9 @@ namespace SimCam {
             if(EventSystem.current.IsPointerOverGameObject()) return null;
             Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
+            /*if(Physics.Raycast(ray, out hit, float.PositiveInfinity, UILayer)) {
+                return null;
+            }*/
             if(Physics.Raycast(ray, out hit, playerEye.farClipPlane, groundPlainMask)) {
                 return hit.point;
             }
@@ -230,6 +212,9 @@ namespace SimCam {
             if(EventSystem.current.IsPointerOverGameObject()) return null;
             Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
+            /*if(Physics.Raycast(ray, out hit, float.PositiveInfinity, UILayer)) {
+                return null;
+            }*/
             if(Physics.Raycast(ray, out hit, playerEye.farClipPlane, objectLayerMask)) {
                 return hit.collider.gameObject;
             }
@@ -237,5 +222,7 @@ namespace SimCam {
         }
 
 
+
     }
+
 }
