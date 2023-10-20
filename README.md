@@ -16,7 +16,7 @@ All are come with events to detect mouse down, mouse up, and mouse click, report
 
 The following optional scripts are also included:
 * A camera mode switcher, to be place on the camera holder object allong with one or more of the above controllers (all be the first should start disabled),
-   allowing swapping between controllers with the press of a buttone.
+   allowing swapping between controllers with the press of a button.
 * An event converter, which converts my custom C# events into untity events for those who want to connect events in the editor.
 
   
