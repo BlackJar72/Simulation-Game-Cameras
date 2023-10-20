@@ -34,8 +34,11 @@ namespace SimCam
 
         private Vector3 pivot, tpos;
 
-        [SerializeField]
-        private LayerMask UILayer;
+        [SerializeField] KeyCode moveMode = KeyCode.LeftShift;
+        private bool inMoveMode;
+
+        [SerializeField] protected KeyCode flyUp =  KeyCode.E;
+        [SerializeField] protected KeyCode flyDown = KeyCode.Q;
 
 
         // TODO:  This should be based on a (game or lot specific) array of 1 or more descrete heights;
@@ -83,8 +86,8 @@ namespace SimCam
 
 
         // Update is called once per frame
-        void Update()
-        {
+        void Update() {
+            inMoveMode = Input.GetKey(moveMode);
             AdjustHeading();
             AdjustPitch();
             SetRotation();
@@ -104,7 +107,7 @@ namespace SimCam
 
 
         void AdjustHeading() {
-            if(!Input.GetKey(KeyCode.LeftShift)) {
+            if(!inMoveMode) {
                 float rotation = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
                 headingAngle -= rotation;
                 if (headingAngle > 360) headingAngle -= 360;
@@ -115,7 +118,7 @@ namespace SimCam
 
 
         void AdjustPitch() {
-            if(!Input.GetKey(KeyCode.LeftShift)) {
+            if(!inMoveMode) {
                 float rotation = Input.GetAxis("Vertical") * rotationSpeed * Time.deltaTime;
                 tiltAngle += rotation;
                 tiltAngle = Mathf.Clamp(tiltAngle, minPitch, maxPitch);
@@ -133,7 +136,7 @@ namespace SimCam
         void Move() {
             movement = Vector3.zero;
             mousePos = Input.mousePosition;
-            if(Input.GetKey(KeyCode.LeftShift)) {
+            if(inMoveMode) {
                 movement.z = Mathf.Clamp(Input.GetAxis("Vertical"), -1, 1);
                 movement.x = Mathf.Clamp(Input.GetAxis("Horizontal"), -1, 1);
             } else {
@@ -149,8 +152,8 @@ namespace SimCam
                 }
             }
             movement = heading * movement;
-            if(Input.GetKey(KeyCode.LeftShift)) movement.y -= 1;
-            if(Input.GetKey(KeyCode.Space)) movement.y += 1;
+            if(Input.GetKey(flyDown)) movement.y -= 1;
+            if(Input.GetKey(flyUp)) movement.y += 1;
             movement.Normalize();
             movement *= moveSpeed ;
             movement *= Time.deltaTime;
@@ -225,7 +228,7 @@ namespace SimCam
             /*if(Physics.Raycast(ray, out hit, float.PositiveInfinity, UILayer)) {
                 return null;
             }*/
-            if(Physics.Raycast(ray, out hit, playerEye.farClipPlane, layerMask)) {
+            if(Physics.Raycast(ray, out hit, playerEye.farClipPlane, objectLayerMask)) {
                 return hit.collider.gameObject;
             }
             return null;

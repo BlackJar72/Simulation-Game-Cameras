@@ -26,6 +26,9 @@ namespace SimCam {
         private float moveSpeedFactor;
         private float moveSpeedIncrement;
 
+        [SerializeField] protected KeyCode flyUp =  KeyCode.Space;
+        [SerializeField] protected KeyCode flyDown = KeyCode.LeftShift;
+
 
         //*
         // Start is called before the first frame update
@@ -108,8 +111,8 @@ namespace SimCam {
             movement = Vector3.zero;
             movement.z = Input.GetAxis("Vertical");
             movement.x = Input.GetAxis("Horizontal");
-            if(Input.GetKey(KeyCode.LeftShift)) movement.y -= 1;
-            if(Input.GetKey(KeyCode.Space)) movement.y += 1;
+            if(Input.GetKey(flyDown)) movement.y -= 1;
+            if(Input.GetKey(flyUp)) movement.y += 1;
             movement.Normalize();
             movement *= moveSpeed ;
             movement *= Time.deltaTime;
@@ -158,7 +161,7 @@ namespace SimCam {
             // Being off the screen or or over the UI should not be a possibility when aiming through
             // the center of the screen; if so you need to fix your UI!
             if(Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward,
-                    out RaycastHit hit, playerEye.farClipPlane, layerMask)) {
+                    out RaycastHit hit, playerEye.farClipPlane, objectLayerMask)) {
                 return hit.collider.gameObject;
             }
             return null;

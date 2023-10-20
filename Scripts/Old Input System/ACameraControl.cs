@@ -14,8 +14,10 @@ namespace SimCam
         [SerializeField] protected LayerMask groundPlainMask;
 
         [SerializeField] protected LayerMask layerMask = 0x1;
+        [SerializeField] protected LayerMask objectLayerMask = 0x1;
 
         protected LayerMask defaultLayerMask;
+        protected LayerMask defaultObjectLayerMask;
 
         public delegate void CamclickHandler(RaycastHit hit);
         public static event CamclickHandler LeftMouseDown;
@@ -50,6 +52,7 @@ namespace SimCam
 
         void Awake() {
             defaultLayerMask = layerMask;
+            defaultObjectLayerMask = objectLayerMask;
         }
 
 
@@ -138,6 +141,16 @@ namespace SimCam
 
         public virtual void ResetLayerMask() {
             layerMask = defaultLayerMask;
+        }
+
+
+        public virtual void SetObjectLayerMask(LayerMask mask) {
+            objectLayerMask = mask;
+        }
+
+
+        public virtual void ResetObjectLayerMask() {
+            objectLayerMask = defaultObjectLayerMask;
         }
 
     }

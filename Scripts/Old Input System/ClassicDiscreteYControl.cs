@@ -33,8 +33,10 @@ namespace SimCam {
 
         private Vector3 pivot;
 
-        [SerializeField]
-        private LayerMask UILayer;
+        [SerializeField] KeyCode moveMode = KeyCode.LeftControl;
+        private bool inMoveMode;
+        [SerializeField] KeyCode goDown = KeyCode.Q;
+        [SerializeField] KeyCode goUp = KeyCode.E;
 
 
 
@@ -87,6 +89,7 @@ namespace SimCam {
 
         // Update is called once per frame
         void Update() {
+            inMoveMode = Input.GetKey(moveMode);
             AdjustHeading();
             AdjustPitch();
             SetRotation();
@@ -106,7 +109,7 @@ namespace SimCam {
 
 
         void AdjustHeading() {
-            if(!Input.GetKey(KeyCode.LeftShift)) {
+            if(!inMoveMode) {
                 float rotation = Input.GetAxis("Horizontal") * rotationSpeed * Time.deltaTime;
                 headingAngle -= rotation;
                 if (headingAngle > 360) headingAngle -= 360;
@@ -117,7 +120,7 @@ namespace SimCam {
 
 
         void AdjustPitch() {
-            if(!Input.GetKey(KeyCode.LeftShift)) {
+            if(!inMoveMode) {
                 float rotation = Input.GetAxis("Vertical") * rotationSpeed * Time.deltaTime;
                 tiltAngle += rotation;
                 tiltAngle = Mathf.Clamp(tiltAngle, minPitch, maxPitch);
@@ -135,7 +138,7 @@ namespace SimCam {
         void Move() {
             movement = Vector3.zero;
             mousePos = Input.mousePosition;
-            if(Input.GetKey(KeyCode.LeftShift)) {
+            if(inMoveMode) {
                 movement.z = Mathf.Clamp(Input.GetAxis("Vertical"), -1, 1);
                 movement.x = Mathf.Clamp(Input.GetAxis("Horizontal"), -1, 1);
             } else {
@@ -151,8 +154,8 @@ namespace SimCam {
                 }
             }
             movement = heading * movement;
-            if (Input.GetKeyUp(KeyCode.Q)) ChangeLevel(-1);
-            if (Input.GetKeyUp(KeyCode.E)) ChangeLevel(1);
+            if (Input.GetKeyUp(goDown)) ChangeLevel(-1);
+            if (Input.GetKeyUp(goUp)) ChangeLevel(1);
             movement.Normalize();
             movement *= moveSpeed ;
             movement *= Time.deltaTime;
@@ -225,9 +228,6 @@ namespace SimCam {
             if(EventSystem.current.IsPointerOverGameObject()) return null;
             Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
-            /*if(Physics.Raycast(ray, out hit, float.PositiveInfinity, UILayer)) {
-                return null;
-            }*/
             if(Physics.Raycast(ray, out hit, playerEye.farClipPlane, groundPlainMask)) {
                 return hit.point;
             }
@@ -241,10 +241,7 @@ namespace SimCam {
             if(EventSystem.current.IsPointerOverGameObject()) return null;
             Ray ray = playerEye.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
-            /*if(Physics.Raycast(ray, out hit, float.PositiveInfinity, UILayer)) {
-                return null;
-            }*/
-            if(Physics.Raycast(ray, out hit, playerEye.farClipPlane, layerMask)) {
+            if(Physics.Raycast(ray, out hit, playerEye.farClipPlane, objectLayerMask)) {
                 return hit.collider.gameObject;
             }
             return null;
