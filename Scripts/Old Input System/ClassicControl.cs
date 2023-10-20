@@ -139,23 +139,12 @@ namespace SimCam
             if(inMoveMode) {
                 movement.z = Mathf.Clamp(Input.GetAxis("Vertical"), -1, 1);
                 movement.x = Mathf.Clamp(Input.GetAxis("Horizontal"), -1, 1);
-            } else {
-                if (mousePos.y <= windowBoundarySize) {
-                    movement.z = -1;
-                } else if (mousePos.y >= (Screen.height - windowBoundarySize)) {
-                    movement.z = 1;
-                }
-                if (mousePos.x <= windowBoundarySize) {
-                    movement.x = -1;
-                } else if (mousePos.x >= (Screen.width - windowBoundarySize)) {
-                    movement.x = 1;
-                }
             }
             movement = heading * movement;
             if(Input.GetKey(flyDown)) movement.y -= 1;
             if(Input.GetKey(flyUp)) movement.y += 1;
             movement.Normalize();
-            movement *= moveSpeed ;
+            movement *= moveSpeed;
             movement *= Time.deltaTime;
             transform.Translate(movement, Space.World);
             if(transform.position.y < floorY) {
