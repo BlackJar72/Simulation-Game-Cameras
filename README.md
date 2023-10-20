@@ -19,7 +19,8 @@ The following optional scripts are also included:
    allowing swapping between controllers with the press of a button.
 * An event converter, which converts my custom C# events into untity events for those who want to connect events in the editor.
 
-  
+The intended setup involve the main camera ("player eye") being a child of the camera holder object to which the scripts are attached; this allows 
+for camera orbiting and mouse-wheel zooming based on moving the camera relative to the camera holder.
 
 
 ## MIT License
