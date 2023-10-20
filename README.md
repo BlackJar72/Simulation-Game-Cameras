@@ -5,6 +5,23 @@ This is actually a collection of usuable cameras that will hopefully, eventually
 ability to switch between them in-game.  It will also, hopefully, ultimately exist in version 
 for both the old and new input systems.
 
+The included controllers are as follows:
+* The classic controller, mouse is unlocked and the cursor is visible; mouse-orbit with WASD or use WASD + Left Shift to move.
+* Classic with discrete y values, like classic controller, but has configurable (and resettable) levels, for using with buildings, houses, and similar structures with descrete floors
+* First person controller, fly around with WASD + mouse, while mving up and down with shift and space (like creative mode in some games)
+* First person with discrete y values, like the above but will switch to the highest of the set floors to be under the camera holder
+* Free cam, flies around with WASD + mouse and always moves in the direction you are facing (including on the virtical)
+
+All are come with events to detect mouse down, mouse up, and mouse click, reporting the Raycast Hit object for us elsewhere.
+
+The following optional scripts are also included:
+* A camera mode switcher, to be place on the camera holder object allong with one or more of the above controllers (all be the first should start disabled),
+   allowing swapping between controllers with the press of a buttone.
+* An event converter, which converts my custom C# events into untity events for those who want to connect events in the editor.
+
+  
+
+
 ## MIT License
 
 Copyright (c) 2022 JaredBGreat
