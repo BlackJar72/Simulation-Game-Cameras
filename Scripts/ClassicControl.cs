@@ -146,6 +146,7 @@ namespace SimCam
             }
             movement.Normalize();
             movement *= moveSpeed;
+            movement *= Mathf.Sqrt(zoomDist / minZoomDist);
             movement *= Time.deltaTime;
             transform.Translate(movement, Space.World);
             if(transform.position.y < floorY) {

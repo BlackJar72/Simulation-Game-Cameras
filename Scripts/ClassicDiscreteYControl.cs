@@ -144,7 +144,8 @@ namespace SimCam {
             if (Input.GetKeyUp(goDown)) ChangeLevel(-1);
             if (Input.GetKeyUp(goUp)) ChangeLevel(1);
             movement.Normalize();
-            movement *= moveSpeed ;
+            movement *= moveSpeed;
+            movement *= Mathf.Sqrt(zoomDist / minZoomDist);
             movement *= Time.deltaTime;
             transform.Translate(movement, Space.World);
         }
