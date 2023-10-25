@@ -35,6 +35,7 @@ namespace SimCam
         [SerializeField] KeyCode moveMode = KeyCode.LeftShift;
         private bool inMoveMode;
 
+        [SerializeField] protected bool allowVerticalFlight = false;
         [SerializeField] protected KeyCode flyUp =  KeyCode.E;
         [SerializeField] protected KeyCode flyDown = KeyCode.Q;
 
@@ -139,8 +140,10 @@ namespace SimCam
                 movement.x = Mathf.Clamp(Input.GetAxis("Horizontal"), -1, 1);
             }
             movement = heading * movement;
-            if(Input.GetKey(flyDown)) movement.y -= 1;
-            if(Input.GetKey(flyUp)) movement.y += 1;
+            if(allowVerticalFlight) {
+                if (Input.GetKey(flyDown)) movement.y -= 1;
+                if (Input.GetKey(flyUp)) movement.y += 1;
+            }
             movement.Normalize();
             movement *= moveSpeed;
             movement *= Time.deltaTime;
