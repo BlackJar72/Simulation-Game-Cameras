@@ -4,11 +4,11 @@ using UnityEngine.Events;
 /// <summary>
 /// This class is for converting C# events from the cameras to
 /// Unity events that can be connected through the Unity editor.
-/// Its use is entirely options, adding this is an alterantive to
+/// Its use is entirely optional, adding this is an alterantive to
 /// coding the connections directly from the ACameraControl's
 /// static C# events.
 ///
-/// Most typically, these events would go to an manager that
+/// Most typically, these events would go to a manager that
 /// can decide what to do based on what is hit.
 /// </summary>
 namespace SimCam {
