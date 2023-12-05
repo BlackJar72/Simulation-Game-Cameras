@@ -153,6 +153,11 @@ namespace SimCam
             objectLayerMask = defaultObjectLayerMask;
         }
 
+
+        public void SetGroundPlain(GameObject plain) {
+            groundPlain = plain;
+        }
+
     }
 
 }

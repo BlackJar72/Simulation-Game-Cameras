@@ -72,6 +72,20 @@ namespace SimCam
             // Return the current camera mode so it can be accessed elsewhere
             return camModes[mode];
         }
+
+
+        public void SetGroundPlain(GameObject plain) {
+            foreach(ACameraControl control in camModes) {
+                control.SetGroundPlain(plain);
+            }
+        }
+
+
+        public void SetCurrentGroundPlain(GameObject plain) {
+            camModes[mode].SetGroundPlain(plain);
+        }
+
+
     }
 
 }

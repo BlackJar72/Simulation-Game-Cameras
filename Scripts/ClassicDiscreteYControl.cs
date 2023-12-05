@@ -33,7 +33,7 @@ namespace SimCam {
 
         private Vector3 pivot;
 
-        [SerializeField] KeyCode moveMode = KeyCode.LeftControl;
+        [SerializeField] KeyCode moveMode = KeyCode.LeftShift;
         private bool inMoveMode;
         [SerializeField] KeyCode goDown = KeyCode.Q;
         [SerializeField] KeyCode goUp = KeyCode.E;
