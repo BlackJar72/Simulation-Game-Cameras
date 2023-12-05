@@ -24,6 +24,8 @@ namespace SimCam {
         private float minPitch = 10;
         [SerializeField][Min(0f)]
         private float maxPitch = 90;
+        [SerializeField][Min(0)]
+        int windowBoundarySize = 10;
 
         [SerializeField][Tooltip("Camera holder Y coordinates for levels; must have at least one valid value.")]
         private float[] levelHeights;
@@ -139,6 +141,17 @@ namespace SimCam {
             if(inMoveMode) {
                 movement.z = Mathf.Clamp(Input.GetAxis("Vertical"), -1, 1);
                 movement.x = Mathf.Clamp(Input.GetAxis("Horizontal"), -1, 1);
+            } else {
+                if(mousePos.y <= windowBoundarySize) {
+                    movement.z = -1;
+                } else if(mousePos.y >= (Screen.height - windowBoundarySize)) {
+                    movement.z = 1;
+                }
+                if(mousePos.x <= windowBoundarySize) {
+                    movement.x = -1;
+                } else if(mousePos.x >= (Screen.width - windowBoundarySize)) {
+                    movement.x = 1;
+                }
             }
             movement = heading * movement;
             if (Input.GetKeyUp(goDown)) ChangeLevel(-1);
