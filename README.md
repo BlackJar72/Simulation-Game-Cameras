@@ -7,7 +7,7 @@ for both the old and new input systems.
 
 MIT License
 
-Copyright (c) 2022 JaredBGreat
+Copyright (c) 2022 Jared Blackburn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
